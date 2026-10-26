@@ -1,0 +1,14 @@
+.idea/
+.vscode/
+.tools/
+**/target/
+**/.gradle/
+**/build/
+**/node_modules/
+**/dist/
+.env
+backend/.env
+backend/src/main/resources/application.properties
+*.log
+tmp/
+**/data/ai-usage.*
