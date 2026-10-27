@@ -55,6 +55,22 @@
 .plan-tradeoff { display: flex; align-items: flex-start; gap: 9px; background: #fff8e9; color: #886a38; font-size: 12px; line-height: 1.8; padding: 15px; border-radius: 8px; margin-top: 18px; }
 .plan-tradeoff svg { flex-shrink: 0; margin-top: 2px; }
 .research-section { margin: 36px 0; scroll-margin-top: 25px; }
+.live-assessment { margin: 24px 0; padding: 25px; border: 1px solid #b9dce0; background: #f5fcfb; }
+.decision-priority-label { display: flex; align-items: center; gap: 8px; color: #577287; font-size: 12px; white-space: nowrap; }
+.decision-priority-label select { padding: 7px 9px; border: 1px solid #c8d9e6; border-radius: 7px; background: white; color: #244b65; }
+.conversation-review .decision-priority-label { align-items: flex-start; flex-direction: column; margin: 16px 0 12px; }
+.conversation-review .decision-priority-label select { width: 100%; }
+.live-assessment h2 { margin: 7px 0 12px; color: #245e61; font-size: 21px; }
+.live-assessment p { color: #415d66; line-height: 1.8; margin: 9px 0; }
+.live-assessment details { margin-top: 16px; border-top: 1px solid #d9e9e8; padding-top: 13px; }
+.live-assessment summary { cursor: pointer; color: #236d70; font-weight: 700; }
+.live-assessment small { color: #6d858b; display: block; margin-top: 12px; line-height: 1.7; }
+.live-source-list { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.live-source-list a { color: #146f80; background: #e5f4f2; border-radius: 7px; padding: 7px 10px; overflow-wrap: anywhere; font-size: 12px; }
+.grounded-claims { padding-left: 18px; color: #405e66; line-height: 1.75; }
+.grounded-claims li { margin: 10px 0; }
+.grounded-claims a { color: #167288; margin-left: 5px; font-size: 12px; }
+.search-suggestions { display: block; border: 0; width: 100%; min-height: 72px; margin-top: 12px; background: transparent; }
 .research-disclosure { color: #798b9b; font-size: 12px; line-height: 1.8; margin: -6px 0 20px; }
 .research-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px; margin-bottom: 20px; }
 .research-card { padding: 25px; }

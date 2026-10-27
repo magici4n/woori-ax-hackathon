@@ -32,7 +32,11 @@ public class ScenarioService {
             });
         }
         if (input.targetReductionKrw() != null && (input.targetReductionKrw().signum() < 0 || input.targetReductionKrw().compareTo(d("1000000000")) > 0)) throw new IllegalArgumentException("목표 감소액은 0~10억원입니다.");
-        return new Conditions(Map.copyOf(result), input.targetReductionKrw());
+        if (input.cashNeedKrw() != null && (input.cashNeedKrw().signum() < 0 || input.cashNeedKrw().compareTo(d("10000000000")) > 0))
+            throw new IllegalArgumentException("필요 현금은 0~100억원입니다.");
+        if (input.holdingMonths() != null && (input.holdingMonths() < 0 || input.holdingMonths() > 120))
+            throw new IllegalArgumentException("보유 계획은 0~120개월입니다.");
+        return new Conditions(Map.copyOf(result), input.targetReductionKrw(), input.cashNeedKrw(), input.holdingMonths());
     }
     public Comparison compare(ScenarioRequest request) {
         if (request == null || !data.symbols().contains(request.symbol())) throw new IllegalArgumentException("분석할 보유 종목을 선택하세요.");

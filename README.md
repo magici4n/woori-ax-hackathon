@@ -1,8 +1,8 @@
 # WON 절세 시나리오
 
-여러 증권사의 해외주식 손익을 모아 보유 유지·일부 절세·절세 우선 시나리오를 먼저 비교하고, 대화로 투자 의사를 반영해 다시 계산하는 우리 WON 청년 IT 아카데미 해커톤 프로토타입입니다.
+여러 증권사의 해외주식 손익을 확인한 뒤 기업 자료를 살펴보고 AI와 투자 의사를 정리합니다. 그 조건으로 시나리오를 비교하고 선택한 안의 계산 보고서를 확인하는 우리 WON 청년 IT 아카데미 해커톤 프로토타입입니다.
 
-React 19 + Vite 7 / Java 17 이상 + Spring Boot 3.5 / Gemini Developer API를 사용합니다. 데이터베이스와 별도 검색 서버 없이 메모리의 가상 계좌와 작은 JSON 자료집으로 실행합니다. 계산은 전부 Java `BigDecimal`로 수행하며 Gemini 키 없이도 자산 조회, 계산, 수동 조건 설정, 근거 조회가 동작합니다.
+React 19 + Vite 7 / Java 17 이상 + Spring Boot 3.5 / OpenAI Responses API를 사용합니다. 데이터베이스와 별도 검색 서버 없이 메모리의 가상 계좌와 작은 JSON 자료집으로 실행합니다. OpenAI 웹 검색으로 최신 기업 자료를 조회합니다. 계산은 전부 Java `BigDecimal`로 수행하며 OpenAI 키 없이도 자산 조회, 계산, 수동 조건 설정, 저장된 근거 조회가 동작합니다.
 
 ## 프로젝트를 여는 방법
 
@@ -50,30 +50,32 @@ IDE 버튼 대신 명령으로 실행하려는 경우에만 사용합니다. JDK
 
 백엔드 JAR을 만들려면 `backend`에서 `gradlew.bat build`를 실행합니다. 결과는 `backend/build/libs/tax-scenario-0.1.0.jar`이며 **API 서버만 포함합니다.** 프론트엔드 배포 빌드는 `frontend`에서 `npm run build`를 실행하면 `frontend/dist`에 생성됩니다. 현재 프론트 실행 방법은 Vite 개발 서버 기준입니다.
 
-## Gemini 연결 (선택)
+## OpenAI 연결 (선택)
 
-키 없이도 계산과 직접 조건 설정이 동작합니다. 실제 Gemini 연결은 가상 데이터로 점검하며, 프로젝트별 할당량과 계정의 실제 청구 상태는 AI Studio에서 확인해야 합니다. 키를 프론트엔드나 채팅, Git에 넣지 말고, 백엔드를 실행할 터미널의 환경변수로 설정한 다음 재시작하세요.
+키 없이도 계산과 직접 조건 설정이 동작합니다. 실제 OpenAI 호출은 유료 크레딧을 소모합니다. 키를 프론트엔드나 채팅, Git에 넣지 말고 백엔드의 환경변수로 설정한 다음 재시작하세요.
 
 `.env.example`은 변수 목록 예시입니다. Spring Boot가 `.env` 파일을 자동으로 읽는 구성은 아닙니다. IDE를 쓰면 Run Configuration의 환경변수에 설정합니다.
 
-IDE의 `TaxApplication` 실행 설정에서 **Environment variables**에 `GEMINI_API_KEY=발급받은키`를 등록하세요. 모델을 바꾸려면 같은 곳에서 `GEMINI_MODEL`을 지정합니다. 저장 후 백엔드를 재시작하고, React 화면의 ‘AI 사용 상태’에서 설정 여부를 확인합니다.
+IDE의 `TaxApplication` 실행 설정에서 **Environment variables**에 `OPENAI_API_KEY=발급받은키`를 등록하세요. 모델을 바꾸려면 같은 곳에서 `OPENAI_MODEL`을 지정합니다. 저장 후 백엔드를 재시작하고, React 화면의 ‘AI 사용 상태’에서 설정 여부를 확인합니다. 로컬에서 `backend/src/main/resources/application.properties`의 `app.openai.key`를 사용할 수도 있지만, 이 파일은 Git에서 제외되며 실제 키를 공유하면 안 됩니다. 이전에 노출된 Gemini 키는 Google AI Studio에서 폐기하세요.
 
-모델 기본값은 `gemini-2.5-flash`입니다. [공식 가격표](https://ai.google.dev/gemini-api/docs/pricing.md) 확인일은 2026-10-26입니다. 이 모델의 무료 입력·출력 제공 및 유료 표준 텍스트 입력 $0.30 / 출력 $2.50(각 100만 토큰)을 기준으로 설정했습니다. 무료 등급의 데이터는 제품 개선에 이용될 수 있고, 유료 등급은 가격표에 별도 데이터 이용 조건이 있습니다. 가상 데이터만 사용하세요. Gemini 앱 구독과 개발용 API 결제는 별개입니다.
+기본 모델은 `gpt-6.1-sol`입니다. [공식 가격표](https://developers.openai.com/api/docs/pricing) 확인일은 2026-10-27입니다. 표준 입력 $2 / 출력 $10(각 100만 토큰), 웹 검색 도구 호출당 $0.01을 앱의 추정 단가로 설정합니다. 검색 결과 입력 토큰도 모델 요금으로 계산됩니다. ChatGPT 구독과 OpenAI API 크레딧은 별개입니다.
 
-[실제 RPM·TPM·RPD 한도](https://ai.google.dev/gemini-api/docs/rate-limits)는 프로젝트·모델·등급에 따라 달라지므로 AI Studio의 활성 한도를 확인해야 합니다. 숫자를 고정된 무료 한도로 가정하지 않습니다.
+실제 모델 접근 권한과 잔액은 [OpenAI Platform](https://platform.openai.com/)에서 확인해야 합니다. 키 없이 진행하거나 API가 실패하면 Java의 계산 시나리오를 표시합니다. 코드 전환 검증에는 모의 응답만 사용했고 유료 API 실호출은 하지 않았습니다.
 
-유료 전환은 해커톤 **운영매니저에게 API 결제를 요청**해야 합니다. 안내문상 팀 선결제 후 청구는 불가합니다. 개인 결제나 유료 전환은 구현 과정에서 수행하지 않았습니다. 결제된 프로젝트의 키를 사용하면 `GEMINI_PAID=true`로 표시 설정을 바꾸세요. 이 플래그는 Google의 실제 청구 상태를 변경하지 않습니다.
+[실제 호출·토큰 한도](https://developers.openai.com/api/docs/guides/rate-limits)는 조직·프로젝트·모델에 따라 다릅니다.
 
-모델 변경은 `GEMINI_MODEL`, `AI_INPUT_USD_PER_MILLION`, `AI_OUTPUT_USD_PER_MILLION`을 함께 설정합니다. 기본 출력 상한은 1,200토큰이며 100~2,000만 허용합니다. 새 모델의 JSON 출력 지원과 요청 형식은 직접 확인해야 합니다. 모델별 thinking 설정은 2.5 Flash 기본 모델에만 넣습니다.
+해커톤 안내문상 팀 선결제 후 청구는 불가하므로 API 크레딧 결제와 비용 처리는 운영매니저의 안내를 따르세요. OpenAI Platform에서 자동 충전 상태와 실제 사용액을 확인하세요.
+
+모델 변경은 `OPENAI_MODEL`, `AI_INPUT_USD_PER_MILLION`, `AI_OUTPUT_USD_PER_MILLION`을 함께 설정합니다. 기본 출력 상한은 5,000토큰이며 100~6,000을 허용합니다. 추론 수준은 `medium`입니다. JSON 응답은 Responses API의 JSON 모드를 사용하고 기존 Java 검증을 유지합니다. 웹 검색 요청은 실제 검색을 강제하고 최대 4회 도구 호출로 제한합니다.
 
 ## AI 사용량과 비용
 
 - 화면 오른쪽 아래 `AI 사용 상태` 또는 `GET /api/ai/usage`에서 누적 호출 시도, 실제 응답 토큰, 비용 추정치를 확인합니다.
-- 실행한 디렉터리의 `data/ai-usage.json`에 누적 기록을 남깁니다. Gradle `bootRun`과 IDE의 Working directory, JAR 실행 위치를 모두 `backend`로 고정하세요. 기록 파일은 Git에서 제외됩니다.
-- 무료 모드에도 유료 가격 환산 추정치를 누적해 앱 예산 제한을 적용합니다. 표시액이 실제 청구액은 아닙니다. 실제 사용량·청구는 [Google AI Studio](https://aistudio.google.com/) Dashboard → Usage 및 Cloud Billing에서 확인합니다.
-- 기본 앱 한도는 누적 40회, 최대 20달러입니다. 호출 전 UTF-8 입력 바이트 수와 출력 상한을 기준으로 비용을 예약합니다. 실패 시 예약액을 유지하고 자동 재시도하지 않습니다. 기록 파일이 손상되거나 기록할 수 없으면 AI 호출을 중단합니다.
-- 동일 모델·입력·조건·자료 버전은 메모리 캐시를 사용합니다. 재시작하면 캐시는 비워지지만 사용량 기록은 유지됩니다. 시뮬레이션 시 계산 후 AI 해설을 한 번 요청합니다. AI 실패 시 자동 재시도하지 않으며 계산 이유와 저장한 기업 자료는 계속 표시합니다.
-- 한 프로세스가 자기 호출을 제한하는 시연용 장치입니다. 같은 API 키를 쓰는 외부 앱·다른 프로세스의 지출, 잘못 입력한 모델 가격은 통제하지 못합니다. 제공자 예산도 함께 설정해야 합니다. 누적 기록을 삭제하면 앱 한도가 초기화됩니다.
+- 실행한 디렉터리의 `data/ai-usage-openai.json`에 누적 기록을 남깁니다. Gradle `bootRun`과 IDE의 Working directory, JAR 실행 위치를 모두 `backend`로 고정하세요. 기록 파일은 Git에서 제외됩니다. 이전 Gemini 사용량과 섞지 않습니다.
+- 표시액은 설정된 모델·검색 단가에 따른 추정치이며 실제 청구액이 아닙니다. 실제 사용량·청구는 [OpenAI Platform](https://platform.openai.com/)에서 확인합니다.
+- 기본 앱 한도는 누적 40회, 최대 20달러입니다. 호출 전 UTF-8 입력 바이트 수·출력 상한·검색 도구 최대 4회를 기준으로 비용을 예약합니다. 실패 시 예약액을 유지하고 자동 재시도하지 않습니다. 검색 결과가 늘린 입력 토큰 때문에 실제 사용액은 예약액을 초과할 수 있습니다. 기록 파일이 손상되거나 기록할 수 없으면 AI 호출을 중단합니다.
+- 동일 모델·입력·조건·자료 버전은 메모리 캐시를 사용합니다. 재시작하면 캐시는 비워지지만 사용량 기록은 유지됩니다. 시나리오 생성 시 검색과 전략 제안을 요청할 수 있습니다. AI 실패 시 자동 재시도하지 않으며 Java 계산 결과와 저장한 기업 자료는 계속 표시합니다.
+- 한 프로세스가 자기 호출을 제한하는 시연용 장치입니다. 같은 API 키를 쓰는 외부 앱·다른 프로세스의 지출, 잘못 입력한 모델 가격은 통제하지 못합니다. OpenAI 프로젝트의 지출 한도도 설정하세요. 누적 기록을 삭제하면 앱 한도가 초기화됩니다.
 
 ## 구현 범위와 계산 가정
 
@@ -94,13 +96,15 @@ IDE의 `TaxApplication` 실행 설정에서 **Environment variables**에 `GEMINI
 ```text
 frontend/
   src/main.jsx                 React 시작점
-  src/App.jsx                  자산 → 시뮬레이션 → 대화 → 재계산 상태와 API 연결
-  src/PortfolioResults.jsx     자산 표·세 가지 결과·기업 근거·대화 진입
+  src/App.jsx                  자산 → 계산 → 기업 자료 → 대화 → 시나리오 → 보고서 흐름과 API 연결
+  src/ReferenceViews.jsx       자산·분석·기업 자료·시나리오 선택·보고서 화면
+  src/reference-flow.css       첨부 화면 흐름에 맞춘 반응형 레이아웃과 인쇄 스타일
+  src/PortfolioResults.jsx     이전 결과 화면 구성 요소 (현재 메인 화면에서는 미사용)
   src/simulation-flow.css      자산/시뮬레이션 화면과 반응형 배치
   src/ui.jsx                   조건 폼·시나리오 그래프·근거 목록 등 재사용 UI
   src/conversation-flow.css    대화 중심 화면과 단계별 배치
   src/woori-theme.css          우리투자증권 참고 테마와 반응형 화면
-  src/ServiceLayout.jsx        브랜드 헤더·메인 배너·3단계 이용 안내
+  src/ServiceLayout.jsx        브랜드 헤더·5단계 이용 안내
   vite.config.js               개발 포트와 API 프록시
 backend/
   build.gradle                 Spring Boot·Java·라이브러리·테스트 설정
@@ -115,7 +119,7 @@ backend/
     PortfolioSimulationService.java 전체 종목의 손실 실현 조합과 세 가지 전략 계산
     ApiController.java         REST API 진입점과 입력 오류 처리
     EvidenceService.java       로컬 자료집의 종목·날짜·자료 종류 필터
-    GeminiService.java         HTTP 호출, 타임아웃, 캐시, 누적 호출·비용 제한
+    OpenAiService.java         Responses API 호출, 웹 인용 추출, 캐시, 누적 호출·비용 제한
     AssistantService.java      선택 종목·최근 대화 전달, 확인 답변·조건 제안 검증
     ConversationService.java   대화별 메모리 상태·확인 질문·만료·초기화
   src/main/resources/
@@ -127,20 +131,23 @@ backend/
 docs/                          행사 요구사항, 시연 순서, 검증 기록
 ```
 
-자산 조회 → 절세 시뮬레이션 시작 → 세 가지 결과·종목별 이유·기업 자료 확인 → 내 투자 의사 이야기하기 → 대화 답장의 재시뮬레이션 버튼 순서입니다. 입력창은 조건 제안 뒤에도 계속 사용할 수 있습니다. 화면 선택 종목과 합산 수량, 대화 초안, 전체 자산 시뮬레이션 요약, 기업 요약, 최근 대화, 확인 질문을 Gemini에 전달합니다. 발화는 1,000자, 이력은 최대 12개(프롬프트에는 각 350자), 세션은 최대 100개·30분 유효, AI 캐시는 최대 100건으로 제한합니다.
+자산 조회 → Java 기본 분석 → 확인된 기업 자료 탐색 → 모달에서 AI와 보유 의사·매도 범위 대화 → 세 가지 시나리오 비교 → 선택한 안의 보고서 확인 순서입니다. 보고서는 브라우저 인쇄 기능으로 PDF 저장할 수 있습니다. 주문 실행과 별도 PDF 생성 서버는 없습니다. 대화 뒤에도 조건을 수정해 다시 계산할 수 있으며, AI 연결이 불가능하면 대화 화면의 직접 조건 수정이나 기본 조건으로 계산할 수 있습니다. 화면 선택 종목과 합산 수량, 대화 초안, 전체 자산 시뮬레이션 요약, 기업 요약, 최근 대화, 확인 질문을 OpenAI에 전달합니다. 발화는 1,000자, 이력은 최대 12개(프롬프트에는 각 350자), 세션은 최대 100개·30분 유효, AI 캐시는 최대 100건으로 제한합니다.
 
 대화 결과는 조건의 **제안**입니다. 사용자가 확인해야 적용합니다. 언급하지 않은 조건은 유지하며, AI가 기존 제한을 완화하려 하면 거절하고 직접 수정을 안내합니다. 화면에서 조건을 직접 삭제·수정하는 것은 사용자의 명시적 변경입니다. 모호한 장기 보유 의사와 계좌 일부 범위는 확인 대상으로 처리합니다. 범위 밖 질문은 조건 비교 기능으로 안내하도록 프롬프트를 제한합니다. 확인 질문에 대한 짧은 긍정·부정은 서버 상태를 기준으로 처리하며, 긍정도 조건 제안만 생성합니다. 종목 변경·새 대화·만료 시 이전 확인 질문은 폐기됩니다. 새 대화는 이미 적용한 조건을 해제하지 않습니다.
 
-근거는 실제 원문을 확인한 짧은 요약입니다. TSLA·AAPL·NVDA·AMZN 공식 발표의 성장 요인·위험·발표일·링크를 표시합니다. 실시간 뉴스 수집, PER 평가, 주가 전망 점수는 구현하지 않습니다. 기업 자료는 보유와 매도의 기회비용을 설명하며 수량 선택은 세무 계산 기준입니다. AI가 반환한 인용 ID나 시나리오 ID가 유효하지 않으면 추가 해설을 폐기합니다. 사실 충실성은 ID 검증만으로 보장되지 않으므로 원문 확인이 필요합니다.
+저장된 기업 근거는 실제 원문을 확인한 짧은 요약입니다. 추가로 시뮬레이션 시 OpenAI 웹 검색으로 최근 뉴스·공시·실적발표 일정·날짜가 확인된 밸류에이션 자료를 조사합니다. URL 인용이 달린 문장과 보유 수량·사용자 제한·절세 목표·의사결정 우선순위를 OpenAI에 전달합니다. OpenAI가 서로 다른 두 가상 매도 전략의 종목별 수량과 근거를 제안합니다. Java는 보유하지 않은 종목, 잘못된 수량, 사용자 제한 위반, 출처 ID 오류를 거부하고 각 전략의 세액·수수료·남은 자산을 계산합니다. 보유 유지 기준과 조건 내 최대 절세액도 Java가 계산합니다. 출처가 없거나 검색·제안·검증에 실패하면 기존 Java 계산 시나리오를 유지합니다. 검색 결과는 30분간 메모리에 보관하며 시뮬레이션마다 최대 2회 OpenAI 응답 호출이 추가될 수 있습니다. 가상 주가·환율은 최신 값으로 갱신되지 않습니다. 자료의 사실 충실성은 URL 인용만으로 보장되지 않으므로 원문 확인이 필요합니다. 테스트는 모의 OpenAI 응답만 사용합니다.
 
 ## API
+
+전략 제안 입력에는 검색 응답 중 `url_citation`으로 출처가 연결된 문장만 사용합니다. 화면에서 각 문장과 해당 출처를 함께 확인할 수 있습니다.
 
 | API | 역할 |
 |---|---|
 | `GET /api/portfolio` | 계좌·보유 종목·원화 평가액·연 손익·세금 규칙 |
 | `POST /api/scenarios` | `{symbol, conditions, customQuantity}`로 비교 |
 | `POST /api/simulation` | `{conditions}`로 전체 보유 종목의 세 가지 시나리오 계산 |
-| `POST /api/simulation/explain` | `{conditions}`를 재계산해 시나리오별 Gemini 해설 생성 |
+| `POST /api/simulation/assess` | `{conditions, decisionPriority}`로 검색 후 AI가 두 매도 전략을 제안하고 Java가 검증·계산; 실패 시 계산 기준 유지 |
+| `POST /api/simulation/explain` | `{conditions}`를 재계산해 시나리오별 OpenAI 해설 생성 |
 | `GET /api/research` | 4개 기업의 성장·위험 요약과 실제 출처 |
 | `POST /api/conditions/extract` | `{message, existing, selectedSymbol, conversationId}`로 대화 조건 제안 |
 | `DELETE /api/conversations/{id}` | 대화 이력·확인 질문 초기화 (적용 조건 유지) |

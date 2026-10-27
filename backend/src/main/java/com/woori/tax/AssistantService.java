@@ -10,17 +10,21 @@ import static com.woori.tax.Models.*;
 
 @Service
 public class AssistantService {
-    private final GeminiService ai;
+    private final OpenAiService ai;
     private final ObjectMapper mapper;
     private final ScenarioService calculations;
     private final EvidenceService evidence;
     private final DemoData data;
     private final ConversationService conversations;
+    private final LiveResearchService liveResearch;
     @Autowired
-    public AssistantService(GeminiService ai, ObjectMapper mapper, ScenarioService calculations, EvidenceService evidence, DemoData data, ConversationService conversations) {
-        this.ai = ai; this.mapper = mapper; this.calculations = calculations; this.evidence = evidence; this.data = data; this.conversations = conversations;
+    public AssistantService(OpenAiService ai, ObjectMapper mapper, ScenarioService calculations, EvidenceService evidence, DemoData data, ConversationService conversations, LiveResearchService liveResearch) {
+        this.ai = ai; this.mapper = mapper; this.calculations = calculations; this.evidence = evidence; this.data = data; this.conversations = conversations; this.liveResearch = liveResearch;
     }
-    public AssistantService(GeminiService ai, ObjectMapper mapper, ScenarioService calculations, EvidenceService evidence, DemoData data) {
+    public AssistantService(OpenAiService ai, ObjectMapper mapper, ScenarioService calculations, EvidenceService evidence, DemoData data, ConversationService conversations) {
+        this(ai, mapper, calculations, evidence, data, conversations, new LiveResearchService(ai, data));
+    }
+    public AssistantService(OpenAiService ai, ObjectMapper mapper, ScenarioService calculations, EvidenceService evidence, DemoData data) {
         this(ai, mapper, calculations, evidence, data, new ConversationService());
     }
     public Map<String,Object> extract(ExtractRequest request) {
@@ -74,7 +78,8 @@ public class AssistantService {
                 지원 종목은 AAPL 애플, TSLA 테슬라, NVDA 엔비디아, AMZN 아마존입니다.
                 currentSelection은 화면 선택 종목과 서버가 확인한 합산 보유 수량입니다.
                 '이 종목'은 선택 종목으로 해석하되 사용자가 명시한 종목을 항상 우선합니다.
-                기존 조건을 유지하며 이번 발화에서 명시한 제외·최대 정수 수량·비율·희망 세금 감소액(원)만 추출하세요.
+                기존 조건을 유지하며 이번 발화에서 명시한 제외·최대 정수 수량·비율·희망 세금 감소액(원)·필요 현금(원)·보유 계획(개월)만 추출하세요.
+                현금 금액과 기간은 사용자가 명시한 경우에만 숫자로 반환하세요. '장기' 등 모호한 표현은 개월 수로 추측하지 마세요.
                 기존 제외 해제나 매도 한도 완화는 직접 설정으로 안내하고 changes를 비우세요.
                 최근 대화는 말뜻 해석용입니다. 명시적으로 취소하거나 거절한 조건을 되살리지 마세요.
                 '장기투자 중'만으로 매도 금지를 확정하지 마세요. 제외할지 질문하고 pendingQuestion에 제안을 기록하세요.
@@ -87,11 +92,11 @@ public class AssistantService {
                 성장 기회에 계속 참여하고 싶은지, 매도 후 재투자하고 싶은지 먼저 물으세요. 임의로 비율·목표·종목을 정하지 마세요.
                 보유 비중을 높이고 싶으면 종목별 매도 허용 수량/비율을 물어 계산 가능한 조건으로 구체화하세요.
                 새 종목 매수·재투자 수익률은 이 시뮬레이션에 포함되지 않는다고 필요할 때만 설명하세요.
-                portfolioSimulation은 현재 조건의 계산 근거입니다. 기업 전망으로 종목을 선택했다고 주장하지 마세요.
+                portfolioSimulation은 현재 조건의 계산 근거입니다. liveResearch는 출처가 있는 최신 조사 자료입니다. 시점과 불확실성을 유지하고 자료에 없는 사실을 만들지 마세요.
                 existingConditions에는 아직 재계산 전인 대화 초안도 포함될 수 있습니다. 계속 대화하며 추가 조건을 누적하세요.
                 조건이 명확해지면 message 끝에 '이 조건으로 다시 시뮬레이션할까요? 더 이야기해도 좋아요.'라고 제안하세요.
                 JSON만 반환: {"changes":[{"symbol":"TSLA","excluded":null,"maxShares":null,"maxPercent":50}],
-                "targetReductionKrw":null,"questions":[],"message":"테슬라는 절반까지 비교하는 조건으로 이해했어요.",
+                "targetReductionKrw":null,"cashNeedKrw":null,"holdingMonths":null,"questions":[],"message":"테슬라는 절반까지 비교하는 조건으로 이해했어요.",
                 "pendingQuestion":null}
                 확인 질문의 예: {"changes":[],"targetReductionKrw":null,"questions":["테슬라를 매도에서 제외할까요?"],
                 "message":"장기 보유 의사만으로 매도에서 제외하지 않고 먼저 확인할게요.",
@@ -104,6 +109,8 @@ public class AssistantService {
             input.put("recentMessages", previousMessages.stream().map(m -> new ConversationMessage(m.role(), safeText(m.text(), 350))).toList()); input.put("pendingQuestion", pending);
             input.put("portfolioSimulation", simulationContext(new PortfolioSimulationService(data, calculations).simulate(new SimulationRequest(existing))));
             input.put("companyResearch", evidence.notes());
+            var currentResearch = liveResearch.current();
+            if (currentResearch != null) input.put("liveResearch", Map.of("claims", currentResearch.claims(), "sources", currentResearch.sources()));
             Map<String,Object> selection = new LinkedHashMap<>();
             selection.put("symbol", request.selectedSymbol());
             selection.put("quantity", data.lots.stream().filter(l -> l.symbol().equals(request.selectedSymbol())).mapToInt(Lot::quantity).sum());
@@ -122,7 +129,12 @@ public class AssistantService {
             JsonNode targetNode = raw.path("targetReductionKrw");
             if (!targetNode.isNull() && !targetNode.isMissingNode() && !targetNode.isNumber()) throw new IllegalArgumentException("목표 금액 형식 오류");
             var target = targetNode.isNull() || targetNode.isMissingNode() ? existing.targetReductionKrw() : targetNode.decimalValue();
-            Conditions proposed = merge(existing, patches, target);
+            JsonNode cashNode = raw.path("cashNeedKrw"), monthsNode = raw.path("holdingMonths");
+            if (!cashNode.isNull() && !cashNode.isMissingNode() && !cashNode.isNumber()) throw new IllegalArgumentException("필요 현금 형식 오류");
+            if (!monthsNode.isNull() && !monthsNode.isMissingNode() && !monthsNode.isIntegralNumber()) throw new IllegalArgumentException("보유 계획 형식 오류");
+            var cashNeed = cashNode.isNull() || cashNode.isMissingNode() ? existing.cashNeedKrw() : cashNode.decimalValue();
+            Integer holdingMonths = monthsNode.isNull() || monthsNode.isMissingNode() ? existing.holdingMonths() : Integer.valueOf(monthsNode.intValue());
+            Conditions proposed = merge(existing, patches, target, cashNeed, holdingMonths);
             conversations.clearPendingQuestion(context);
             if (!questions.isEmpty()) {
                 JsonNode waiting = raw.path("pendingQuestion");
@@ -133,10 +145,10 @@ public class AssistantService {
                     merge(existing, List.of(patch), existing.targetReductionKrw());
                     conversations.setPendingQuestion(context, patch, questions.get(0));
                 }
-                return finish(context, existing, existing, List.of(), questions, responseMessage, "gemini");
+                return finish(context, existing, existing, List.of(), questions, responseMessage, "openai");
             }
-            return finish(context, existing, proposed, patches, List.of(), responseMessage, "gemini");
-        } catch (GeminiService.AiUnavailable e) {
+            return finish(context, existing, proposed, patches, List.of(), responseMessage, "openai");
+        } catch (OpenAiService.AiUnavailable e) {
             return finish(context, existing, existing, List.of(), List.of(), e.getMessage(), "unavailable");
         } catch (Exception e) {
             return finish(context, existing, existing, List.of(), List.of(), "조건을 안전하게 확인할 수 없어요. 종목과 수량을 명확히 다시 입력하거나 직접 설정을 이용해 주세요.", "unavailable");
@@ -152,7 +164,12 @@ public class AssistantService {
             if (before.maxPercent() != null && p.maxPercent() != null && p.maxPercent().compareTo(before.maxPercent()) > 0) throw new IllegalArgumentException("최대 비율 완화는 직접 설정에서 확인하세요.");
             merged.put(p.symbol(), new Condition(Boolean.TRUE.equals(p.excluded()) || before.excluded(), p.maxShares() == null ? before.maxShares() : p.maxShares(), p.maxPercent() == null ? before.maxPercent() : p.maxPercent()));
         }
-        return calculations.validate(new Conditions(merged, target));
+        return calculations.validate(new Conditions(merged, target, existing.cashNeedKrw(), existing.holdingMonths()));
+    }
+    private Conditions merge(Conditions existing, List<ConditionPatch> patches, java.math.BigDecimal target,
+                             java.math.BigDecimal cashNeed, Integer holdingMonths) {
+        Conditions merged = merge(existing, patches, target);
+        return calculations.validate(new Conditions(merged.symbols(), merged.targetReductionKrw(), cashNeed, holdingMonths));
     }
     private Map<String,Object> finish(ConversationService.Context context, Conditions existing, Conditions proposed,
                                       List<ConditionPatch> changes, List<String> questions, String message, String mode) {
@@ -190,7 +207,7 @@ public class AssistantService {
                 if (!expected.remove(id) || ids.isEmpty() || !allowed.containsAll(ids) || !item.path("text").isTextual() || item.path("text").asText().isBlank()) throw new IllegalArgumentException("설명 근거 오류");
                 answers.add(Map.of("id", id, "text", safeText(item.path("text").asText(), 600), "sourceIds", ids));
             }
-            return Map.of("mode", "gemini", "scenarios", answers);
+            return Map.of("mode", "openai", "scenarios", answers);
         } catch (Exception e) {
             return Map.of("mode", "unavailable", "scenarios", List.of(), "message", "AI 추가 해설을 불러오지 못했어요. 계산에 따른 선택 이유와 확인된 기업 자료는 아래에서 볼 수 있습니다.");
         }
@@ -225,7 +242,7 @@ public class AssistantService {
                 answer.put(field, safeText(raw.path(field).asText(), 600));
             }
             if (!hasCompany) { answer.put("positive", "해당 종목 근거 부족"); answer.put("negative", "해당 종목 근거 부족"); }
-            answer.put("mode", "gemini"); answer.put("sourceIds", ids); answer.put("sources", found.stream().filter(s -> ids.contains(s.id())).toList());
+            answer.put("mode", "openai"); answer.put("sourceIds", ids); answer.put("sources", found.stream().filter(s -> ids.contains(s.id())).toList());
             return answer;
         } catch (Exception e) {
             return Map.of("mode", "unavailable", "message", "AI 설명을 불러오지 못했습니다. 다시 요청할 수 있으며 계산 결과와 아래 근거는 계속 확인할 수 있습니다.", "sources", found, "comparison", "매도 수량에 따라 예상 세금, 추가 비용, 잔여 주식과 가격 가정별 자산이 달라집니다.", "positive", hasCompany ? "원문 자료에서 긍정 참고 요인을 확인해 주세요." : "해당 종목 근거 부족", "negative", hasCompany ? "원문 자료에서 위험 요인과 한계를 확인해 주세요." : "해당 종목 근거 부족", "limitations", "시연용으로 수집한 자료집이며 최신 뉴스 전체를 포함하지 않습니다.");

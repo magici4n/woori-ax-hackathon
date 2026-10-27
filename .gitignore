@@ -11,4 +11,4 @@ backend/.env
 backend/src/main/resources/application.properties
 *.log
 tmp/
-**/data/ai-usage.*
+**/data/ai-usage*

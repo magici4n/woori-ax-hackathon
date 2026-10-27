@@ -9,7 +9,7 @@ import org.springframework.http.MediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(properties = {"app.gemini.key="})
+@SpringBootTest(properties = {"app.openai.key="})
 @AutoConfigureMockMvc
 class ApiTest {
     @Autowired MockMvc mvc;
@@ -36,5 +36,8 @@ class ApiTest {
         mvc.perform(get("/api/research")).andExpect(status().isOk()).andExpect(jsonPath("$.notes.length()").value(4)).andExpect(jsonPath("$.sources.length()").value(8));
         mvc.perform(post("/api/simulation/explain").contentType(MediaType.APPLICATION_JSON).content("{}"))
             .andExpect(status().isOk()).andExpect(jsonPath("$.mode").value("unavailable"));
+        mvc.perform(post("/api/simulation/assess").contentType(MediaType.APPLICATION_JSON).content("{}"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.mode").value("unavailable"))
+            .andExpect(jsonPath("$.comparison.scenarios.length()").value(3));
     }
 }

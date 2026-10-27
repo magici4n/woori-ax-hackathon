@@ -62,4 +62,14 @@ class PortfolioSimulationServiceTest {
         assertThat(result.scenarios().get(1).duplicateOf()).isEqualTo("hold");
         assertThatThrownBy(() -> service.simulate(new SimulationRequest(new Conditions(Map.of("AAPL", new Condition(false, 26, null)), null)))).isInstanceOf(IllegalArgumentException.class);
     }
+    @Test void aiProposalMustRespectUserExclusionAndJavaComputesTax() {
+        var conditions = new Conditions(Map.of("TSLA", new Condition(true, null, null)), null);
+        var sales = Map.of("TSLA", 1, "AAPL", 0, "NVDA", 0, "AMZN", 0);
+        assertThatThrownBy(() -> service.evaluateProposal(conditions, sales, "balanced", "전략", "근거", "위험"))
+            .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("사용자 제한");
+        var allowed = service.evaluateProposal(Conditions.empty(), sales, "balanced", "전략", "근거", "위험");
+        assertThat(allowed.estimatedTaxKrw()).isLessThan(service.simulate(new SimulationRequest(Conditions.empty())).baselineTaxKrw());
+        assertThat(allowed.holdings()).filteredOn(h -> h.symbol().equals("TSLA"))
+            .extracting(HoldingPlan::sellQuantity).containsExactly(1);
+    }
 }

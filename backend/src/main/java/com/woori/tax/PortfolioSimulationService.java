@@ -59,6 +59,40 @@ public class PortfolioSimulationService {
         notices.add("기업 자료는 보유·매도의 기회와 위험을 이해하는 참고 정보입니다. 시나리오 수량은 가격 전망 점수가 아닌 손익·세금·매도 한도로 계산합니다.");
         return new PortfolioComparison(baseline, maxReduction, conditions, data.rule, scenarios, notices);
     }
+    public PortfolioScenario evaluateProposal(Conditions rawConditions, Map<String,Integer> quantities,
+                                              String id, String title, String reason, String tradeoff) {
+        Conditions conditions = calculator.validate(rawConditions);
+        if (quantities == null || !data.symbols().containsAll(quantities.keySet()))
+            throw new IllegalArgumentException("AI가 보유하지 않은 종목을 제안했습니다.");
+        List<Option> options = new ArrayList<>();
+        BigDecimal gain = BigDecimal.ZERO, fee = BigDecimal.ZERO, cash = BigDecimal.ZERO, soldValue = BigDecimal.ZERO;
+        for (String symbol : data.symbols()) {
+            int total = data.lots.stream().filter(l -> l.symbol().equals(symbol)).mapToInt(Lot::quantity).sum();
+            Integer quantity = quantities.get(symbol);
+            if (quantity == null || quantity < 0 || quantity > calculator.allowedQuantity(total, conditions.symbols().get(symbol)))
+                throw new IllegalArgumentException("AI 매도 수량이 보유 수량 또는 사용자 제한을 벗어났습니다: " + symbol);
+            Option option = option(symbol, quantity);
+            options.add(option);
+            gain = gain.add(option.gain()); fee = fee.add(option.fee());
+            cash = cash.add(option.cash()); soldValue = soldValue.add(option.soldValue());
+        }
+        Candidate candidate = new Candidate(List.copyOf(options), gain, fee, cash, soldValue,
+            calculator.tax(calculator.baselineGain().add(gain)));
+        return describe(id, title, reason, tradeoff, candidate, conditions, null);
+    }
+    public List<Map<String,Object>> planningFacts(Conditions rawConditions) {
+        Conditions conditions = calculator.validate(rawConditions);
+        List<Map<String,Object>> facts = new ArrayList<>();
+        for (String symbol : data.symbols()) {
+            List<Lot> lots = data.lots.stream().filter(l -> l.symbol().equals(symbol)).toList();
+            int total = lots.stream().mapToInt(Lot::quantity).sum();
+            int allowed = calculator.allowedQuantity(total, conditions.symbols().get(symbol));
+            facts.add(Map.of("symbol", symbol, "name", lots.get(0).name(), "quantity", total,
+                "maxSellQuantity", allowed, "taxGainIfMaxSoldKrw", won(option(symbol, allowed).gain()),
+                "marketValueKrw", won(option(symbol, total).soldValue())));
+        }
+        return facts;
+    }
     private Option option(String symbol, int quantity) {
         int left = quantity;
         BigDecimal gain = BigDecimal.ZERO, fee = BigDecimal.ZERO, cash = BigDecimal.ZERO, gross = BigDecimal.ZERO;
@@ -90,12 +124,13 @@ public class PortfolioSimulationService {
             List<Lot> lots = data.lots.stream().filter(l -> l.symbol().equals(o.symbol())).toList();
             int total = lots.stream().mapToInt(Lot::quantity).sum();
             Condition condition = conditions.symbols().get(o.symbol());
-            String why = o.quantity() > 0 ? "원화 세무상 손실을 실현해 합산 과세 손익을 낮춥니다. 기업 전망 악화로 선택한 종목은 아닙니다."
+            String why = o.quantity() > 0 && o.gain().signum() < 0 ? "이 수량의 매도로 원화 세무상 손실을 실현합니다. 기업 전망 악화로 단정한 선택은 아닙니다."
+                : o.quantity() > 0 ? "이 수량의 매도로 원화 세무상 이익이 실현될 수 있습니다. 세금 증가와 보유 기회 감소를 함께 비교하세요."
                 : condition != null && condition.excluded() ? "사용자가 매도 제외를 요청해 전량 보유합니다."
                 : id.equals("hold") ? "매도 없는 기준 시나리오입니다."
                 : calculator.allowedQuantity(total, condition) == 0 ? "매도 한도가 0주라 보유합니다."
                 : lots.stream().allMatch(l -> calculator.perShareTaxGain(l).signum() >= 0) ? "원화 세무상 이익 종목이라 손실 실현을 통한 절세 후보에 포함하지 않았습니다."
-                : "이 조합은 다른 종목으로 목표 세금 감소를 달성하거나 적용 한도 안에서 추가 감소가 없어 보유합니다.";
+                : "이 조합에서는 해당 종목을 계속 보유합니다.";
             holdings.add(new HoldingPlan(o.symbol(), lots.get(0).name(), total, o.quantity(), total - o.quantity(), won(o.gain()), why));
         }
         List<FutureValue> futures = new ArrayList<>();

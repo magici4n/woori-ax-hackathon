@@ -16,8 +16,12 @@ public final class Models {
         public BigDecimal getCombinedRatePercent() { return nationalRate.add(localRate).movePointRight(2); }
     }
     public record Condition(boolean excluded, Integer maxShares, BigDecimal maxPercent) {}
-    public record Conditions(Map<String, Condition> symbols, BigDecimal targetReductionKrw) {
-        public static Conditions empty() { return new Conditions(Map.of(), null); }
+    public record Conditions(Map<String, Condition> symbols, BigDecimal targetReductionKrw,
+                             BigDecimal cashNeedKrw, Integer holdingMonths) {
+        public Conditions(Map<String, Condition> symbols, BigDecimal targetReductionKrw) {
+            this(symbols, targetReductionKrw, null, null);
+        }
+        public static Conditions empty() { return new Conditions(Map.of(), null, null, null); }
     }
     public record ScenarioRequest(String symbol, Conditions conditions, Integer customQuantity) {}
     public record FutureValue(String label, BigDecimal changePercent, BigDecimal netAssetsKrw) {}
@@ -46,7 +50,9 @@ public final class Models {
                             List<String> questions, String message, String mode) {}
     public record ConditionPatch(String symbol, Boolean excluded, Integer maxShares, BigDecimal maxPercent) {}
     public record ExplainRequest(String symbol, Conditions conditions, Integer customQuantity) {}
-    public record SimulationRequest(Conditions conditions) {}
+    public record SimulationRequest(Conditions conditions, String decisionPriority) {
+        public SimulationRequest(Conditions conditions) { this(conditions, null); }
+    }
     public record HoldingPlan(String symbol, String name, int quantity, int sellQuantity, int remainingQuantity,
                               BigDecimal realizedGainKrw, String reason) {}
     public record PortfolioScenario(String id, String title, String reason, String tradeoff,

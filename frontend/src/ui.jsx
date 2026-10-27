@@ -4,7 +4,7 @@ export const won = value => new Intl.NumberFormat('ko-KR', { maximumFractionDigi
 export const number = value => new Intl.NumberFormat('ko-KR', { maximumFractionDigits: 2 }).format(value ?? 0);
 export const signedWon = value => (Number(value) > 0 ? '+' : '') + won(value);
 export const names = { TSLA: '테슬라', AAPL: '애플', NVDA: '엔비디아', AMZN: '아마존' };
-export const emptyConditions = { symbols: {}, targetReductionKrw: null };
+export const emptyConditions = { symbols: {}, targetReductionKrw: null, cashNeedKrw: null, holdingMonths: null };
 export async function api(path, body, signal, method) {
   const response = await fetch('/api' + path, { method: method || (body === undefined ? 'GET' : 'POST'), headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body), signal });
   const data = await response.json();
@@ -54,6 +54,8 @@ export function ManualForm({ conditions, positions, onApply, disabled = false })
       <div className="two-inputs"><label>최대 수량<input type="number" min="0" max={qty} step="1" disabled={draft.symbols[symbol]?.excluded} value={draft.symbols[symbol]?.maxShares ?? ''} placeholder="제한 없음" onChange={e => update(symbol, 'maxShares', e.target.value === '' ? null : Number(e.target.value))}/></label><label>최대 비율 (%)<input type="number" min="0" max="100" step="0.1" disabled={draft.symbols[symbol]?.excluded} value={draft.symbols[symbol]?.maxPercent ?? ''} placeholder="제한 없음" onChange={e => update(symbol, 'maxPercent', e.target.value === '' ? null : Number(e.target.value))}/></label></div>
     </div>)}
     <label className="target-label">희망 세금 감소액 (원)<input type="number" min="0" max="1000000000" step="1" value={draft.targetReductionKrw ?? ''} placeholder="예: 300000" onChange={e => setDraft({ ...draft, targetReductionKrw: e.target.value === '' ? null : Number(e.target.value) })}/></label>
+      <label className="target-label">필요 현금 (원)<input type="number" min="0" max="10000000000" step="1" value={draft.cashNeedKrw ?? ''} placeholder="예: 5000000" onChange={e => setDraft({ ...draft, cashNeedKrw: e.target.value === '' ? null : Number(e.target.value) })}/></label>
+      <label className="target-label">보유 계획 (개월)<input type="number" min="0" max="120" step="1" value={draft.holdingMonths ?? ''} placeholder="예: 12" onChange={e => setDraft({ ...draft, holdingMonths: e.target.value === '' ? null : Number(e.target.value) })}/></label>
     {error && <p role="alert" className="error-text">{error}</p>}
     <button className="button primary wide" type="submit" disabled={disabled}>조건 적용하고 다시 계산</button>
   </form>;

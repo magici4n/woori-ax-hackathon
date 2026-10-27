@@ -11,13 +11,15 @@ public class ApiController {
     private final DemoData data;
     private final ScenarioService scenarios;
     private final AssistantService assistant;
-    private final GeminiService ai;
+    private final OpenAiService ai;
     private final ConversationService conversations;
     private final PortfolioSimulationService simulation;
     private final EvidenceService evidence;
-    public ApiController(DemoData data, ScenarioService scenarios, AssistantService assistant, GeminiService ai, ConversationService conversations, PortfolioSimulationService simulation, EvidenceService evidence) {
+    private final LiveAssessmentService liveAssessment;
+    private final LiveResearchService liveResearch;
+    public ApiController(DemoData data, ScenarioService scenarios, AssistantService assistant, OpenAiService ai, ConversationService conversations, PortfolioSimulationService simulation, EvidenceService evidence, LiveAssessmentService liveAssessment, LiveResearchService liveResearch) {
         this.data = data; this.scenarios = scenarios; this.assistant = assistant; this.ai = ai; this.conversations = conversations;
-        this.simulation = simulation; this.evidence = evidence;
+        this.simulation = simulation; this.evidence = evidence; this.liveAssessment = liveAssessment; this.liveResearch = liveResearch;
     }
     @GetMapping("/portfolio") public Map<String,Object> portfolio() {
         var positions = data.lots.stream().map(l -> {
@@ -35,11 +37,16 @@ public class ApiController {
     }
     @PostMapping("/scenarios") public Comparison compare(@RequestBody ScenarioRequest request) { return scenarios.compare(request); }
     @PostMapping("/simulation") public PortfolioComparison simulate(@RequestBody SimulationRequest request) { return simulation.simulate(request); }
+    @PostMapping("/simulation/assess") public LiveAssessmentService.Assessment assess(@RequestBody SimulationRequest request) { return liveAssessment.assess(request); }
     @PostMapping("/simulation/explain") public Map<String,Object> explainSimulation(@RequestBody SimulationRequest request) {
         return assistant.explainPortfolio(simulation.simulate(request));
     }
     @GetMapping("/research") public Map<String,Object> research() {
         return Map.of("notes", evidence.notes(), "sources", evidence.all(java.time.LocalDate.parse(data.rule.asOf())), "asOf", data.rule.asOf());
+    }
+    @PostMapping("/research/live") public Map<String,Object> liveResearch() {
+        var found = liveResearch.research();
+        return Map.of("research", found, "researchedAt", java.time.LocalDate.now(java.time.ZoneId.of("Asia/Seoul")).toString());
     }
     @PostMapping("/conditions/extract") public Map<String,Object> extract(@RequestBody ExtractRequest request) { return assistant.extract(request); }
     @DeleteMapping("/conversations/{id}") public Map<String,String> resetConversation(@PathVariable String id) {

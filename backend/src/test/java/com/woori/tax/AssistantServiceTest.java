@@ -13,13 +13,13 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 class AssistantServiceTest {
-    private GeminiService ai;
+    private OpenAiService ai;
     private AssistantService assistant;
     private EvidenceService evidence;
     private ScenarioService calculations;
     private ObjectMapper mapper;
     @BeforeEach void setup() throws Exception {
-        mapper = new ObjectMapper(); ai = mock(GeminiService.class);
+        mapper = new ObjectMapper(); ai = mock(OpenAiService.class);
         var data = new DemoData(mapper); calculations = new ScenarioService(data); evidence = new EvidenceService(mapper);
         assistant = new AssistantService(ai, mapper, calculations, evidence, data);
     }
@@ -34,6 +34,19 @@ class AssistantServiceTest {
         assertThat(proposed.symbols().get("TSLA").maxPercent()).isEqualByComparingTo("50");
         assertThat(proposed.targetReductionKrw()).isEqualByComparingTo("300000");
         assertThat(old.symbols()).doesNotContainKey("TSLA");
+        assertThat(response.get("canApply")).isEqualTo(true);
+    }
+    @Test void explicitCashAndHoldingGoalsAreExtractedWithoutErasingExistingGoals() throws Exception {
+        when(ai.json(anyString(), anyString(), anyString())).thenReturn(mapper.readTree("""
+            {"changes":[],"targetReductionKrw":null,"cashNeedKrw":5000000,"holdingMonths":18,
+             "questions":[],"message":"현금과 보유 기간을 조건에 반영했어요."}
+            """));
+        var old = new Conditions(Map.of(), d("300000"));
+        var response = assistant.extract(new ExtractRequest("현금 500만원이 필요하고 18개월 보유할래", old));
+        var proposed = (Conditions) response.get("conditions");
+        assertThat(proposed.cashNeedKrw()).isEqualByComparingTo("5000000");
+        assertThat(proposed.holdingMonths()).isEqualTo(18);
+        assertThat(proposed.targetReductionKrw()).isEqualByComparingTo("300000");
         assertThat(response.get("canApply")).isEqualTo(true);
     }
     @Test void ambiguousIntentCannotApplyChanges() throws Exception {
@@ -54,7 +67,7 @@ class AssistantServiceTest {
         assertThat(result.get("canApply")).isEqualTo(false);
     }
     @Test void providerFailureLeavesCalculationAndManualConditionsWorking() {
-        when(ai.json(anyString(), anyString(), anyString())).thenThrow(new GeminiService.AiUnavailable("quota"));
+        when(ai.json(anyString(), anyString(), anyString())).thenThrow(new OpenAiService.AiUnavailable("quota"));
         var manual = new Conditions(Map.of("TSLA", new Condition(false, 5, null)), null);
         var chat = assistant.extract(new ExtractRequest("반만", manual));
         assertThat(chat.get("mode")).isEqualTo("unavailable");
