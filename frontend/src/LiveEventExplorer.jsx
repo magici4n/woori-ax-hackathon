@@ -33,7 +33,7 @@ function StockAnalysisCard({ analysis, sources, researchedAt }) {
   </div>;
 }
 
-export function EventExplorer({ portfolio, liveResearch, researchBusy, researchError, onResearch, selectedSymbol, onSelectSymbol, onChat }) {
+export function EventExplorer({ portfolio, liveResearch, researchBusy, selectedSymbol, onSelectSymbol, onChat }) {
   const [tab, setTab] = useState('summary');
   const [query, setQuery] = useState('');
   const [kind, setKind] = useState('all');
@@ -41,7 +41,6 @@ export function EventExplorer({ portfolio, liveResearch, researchBusy, researchE
   const articles = [...(liveResearch?.articles || [])].sort((a, b) => (b.publishedAt || '').localeCompare(a.publishedAt || ''));
   const sources = liveResearch?.research?.sources || [];
   const selectedArticles = articles.filter(article => article.symbol === selectedSymbol && (kind === 'all' || article.kind === kind));
-  const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' });
   const stockAnalysis = liveResearch?.stockAnalyses?.find(analysis => analysis.symbol === selectedSymbol);
   const holding = portfolio.positions.filter(position => position.lot.symbol === selectedSymbol);
   const quantity = holding.reduce((sum, position) => sum + Number(position.lot.quantity), 0);
@@ -53,19 +52,11 @@ export function EventExplorer({ portfolio, liveResearch, researchBusy, researchE
   });
   return <div className="events-page">
     <section className="reference-hero compact"><div className="reference-hero-copy"><span className="reference-kicker">이벤트 분석</span><h1>매도 검토를 위해<br/><em>주요 기업 이벤트를 먼저 확인해요.</em></h1><p>보유 종목의 실제 기사·공시를 AI가 정리했습니다. 실적 일정과 성장 요인, 함께 볼 위험을 살펴보세요.</p></div></section>
-    <section className="reference-main-card live-research-panel"><div className="reference-section-head"><div><h2>최신 기업·실적 자료 조사</h2><p>한국 주요 기사와 기업 발표·공시를 바탕으로 투자에 필요한 정보를 확인하세요.</p></div><button className="button light" disabled={researchBusy} onClick={onResearch}>{researchBusy ? '기사 검색·AI 분석 중…' : liveResearch ? '기사 다시 검색·분석' : '최신 자료 조사 시작'}</button></div>
-      {researchError && <p role="alert" className="error-text">{researchError}</p>}
-      {liveResearch?.warnings?.length > 0 && <div role="alert" className="error-text"><strong>완료하지 못한 단계</strong><ul>{liveResearch.warnings.map((warning, index) => <li key={index}>{warning}</li>)}</ul></div>}
-      {liveResearch ? <><p className="muted">조사 날짜 {liveResearch.researchedAt} · 출처 {sources.length}개 · 종목 연결 자료 {articles.length}건. {liveResearch.message}</p>
-        <details className="live-all-sources"><summary>검색한 원문 출처 전체 보기</summary><div>{sources.map(source => <a key={source.id} href={source.url} target="_blank" rel="noreferrer">{source.title} ↗</a>)}</div></details></>
-        : <p className="event-caveat">아직 검색하지 않았습니다. 조사 시작 후 종목별 기사·공시와 요약이 여기에 표시됩니다.</p>}
-    </section>
     <div className="event-workspace"><section className="reference-main-card event-list"><div className="reference-section-head"><div><h2>보유 종목별 기업 자료</h2><p>종목을 선택하면 AI가 요약한 자료와 원문을 확인할 수 있어요.</p></div></div>
-      <label className="event-search-field"><span aria-hidden="true">⌕</span><input className="event-search" value={query} onChange={event => setQuery(event.target.value)} aria-label="보유 종목 검색" placeholder="종목명 또는 종목코드 검색"/></label>
+      <label className="event-search-field"><Icon name="search" size={20}/><input className="event-search" value={query} onChange={event => setQuery(event.target.value)} aria-label="보유 종목 검색" placeholder="종목명 또는 종목코드 검색"/></label>
       <div className="event-filters" aria-label="자료 종류">{[['all', '전체'], ['company', '기업 발표'], ['filing', '공시'], ['news', '뉴스/리포트']].map(([filter, label]) => <button key={filter} className={kind === filter ? 'active' : ''} onClick={() => setKind(filter)}>{label}</button>)}</div>
-      <div className="event-list-heading"><span>종목명</span><span>확인된 자료</span><span>다음 일정</span></div>
-      <div className="event-rows">{visibleSymbols.map(symbol => { const stockArticles = articles.filter(article => article.symbol === symbol); const nextDate = stockArticles.map(article => article.eventDate).filter(value => value && value >= today).sort()[0]; const kinds = [...new Set(stockArticles.map(article => article.kind))]; const analyzed = liveResearch?.stockAnalyses?.some(analysis => analysis.symbol === symbol); return <button key={symbol} className={'event-row ' + (selectedSymbol === symbol ? 'active' : '')} onClick={() => { onSelectSymbol(symbol); setTab('summary'); }}><StockMark symbol={symbol}/><span className="event-row-name"><strong>{names[symbol] || symbol}</strong><small>{symbol}</small></span><span className="event-row-kinds">{kinds.length ? kinds.slice(0, 2).map(item => <small key={item} className={'event-kind ' + item}>{kindLabel[item] || '검색 자료'}</small>) : <small>자료 없음</small>}</span><span className="event-row-meta">{nextDate || '확인된 일정 없음'}<small>{stockArticles.length}건 · {analyzed ? '종합 분석 완료' : '분석 미완료'}</small></span><b aria-hidden="true">›</b></button>; })}{visibleSymbols.length === 0 && <p className="event-caveat">조건에 맞는 자료가 없습니다.</p>}</div>
-      <p className="event-caveat">자료 내용과 실적 예정일은 연결된 원문에서 다시 확인하세요.</p>
+      <div className="event-list-heading"><span>종목명</span><span>자료 종류</span><span>자료</span></div>
+      <div className="event-rows">{visibleSymbols.map(symbol => { const stockArticles = articles.filter(article => article.symbol === symbol); const kinds = [...new Set(stockArticles.map(article => article.kind))]; const analyzed = liveResearch?.stockAnalyses?.some(analysis => analysis.symbol === symbol); return <button key={symbol} className={'event-row ' + (selectedSymbol === symbol ? 'active' : '')} onClick={() => { onSelectSymbol(symbol); setTab('summary'); }}><StockMark symbol={symbol}/><span className="event-row-name"><strong>{names[symbol] || symbol}</strong><small>{symbol}</small></span><span className="event-row-kinds">{kinds.length ? kinds.slice(0, 2).map(item => <small key={item} className={'event-kind ' + item}>{kindLabel[item] || '검색 자료'}</small>) : <small>자료 없음</small>}</span><span className="event-row-meta">{stockArticles.length}건<small>{analyzed ? '종합 분석 완료' : '분석 미완료'}</small></span><b aria-hidden="true">›</b></button>; })}{visibleSymbols.length === 0 && <p className="event-caveat">조건에 맞는 자료가 없습니다.</p>}</div>
     </section><section className="reference-main-card event-detail"><div className="event-detail-top"><div className="stock-cell"><StockMark symbol={selectedSymbol}/><div><h2>{names[selectedSymbol] || selectedSymbol}</h2><small>{selectedSymbol}</small></div></div><span className="tag">보유 {quantity}주 · {won(value)}</span></div>
       <div className="event-holding-stats"><div><span>평가금액</span><strong>{won(value)}</strong></div><div><span>평가손익</span><strong>{won(unrealized)}</strong></div><div><span>확인한 자료</span><strong>{selectedArticles.length}건</strong></div></div>
       <div className="event-tabs" role="tablist" aria-label="기업 자료 보기">{[['summary', 'AI 분석 요약'], ['materials', '기업 자료'], ['decision', '매도 검토 포인트']].map(([id, label]) => <button key={id} role="tab" aria-selected={tab === id} className={tab === id ? 'active' : ''} onClick={() => setTab(id)}>{label}</button>)}</div>

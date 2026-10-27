@@ -106,7 +106,6 @@
 .event-chat-launch p { color: #5f79a4; font-size: 13px; line-height: 1.7; margin-bottom: 15px; }
 .event-chat-note { display: flex; align-items: center; gap: 14px; border-radius: 14px; background: #fff; padding: 17px; box-shadow: 0 14px 30px #1d70c026; min-width: 310px; }
 .event-chat-note p { margin: 0; }
-.reference-app .flow-demo-note { margin-top: 24px; }
 .reference-app .service-footer { display: flex; justify-content: space-between; padding: 22px 0 34px; color: #8698b5; font-size: 12px; }
 .reference-app .service-footer button { border: 0; background: none; color: #075ee4; }
 .reference-modal-backdrop { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 24px; background: #0a183fb3; backdrop-filter: blur(5px); }
@@ -261,12 +260,6 @@
   .report-grid { display: block; }
   .report-grid .reference-main-card { break-inside: avoid; margin-bottom: 12px; }
 }
-.live-research-panel { margin: 22px 0; }
-.live-research-panel .reference-section-head { gap: 18px; align-items: flex-start; }
-.live-research-panel .reference-section-head .button { flex: 0 0 auto; }
-.live-all-sources { margin-top: 14px; color: #32598b; font-size: 12px; }
-.live-all-sources > div { display: grid; gap: 7px; margin-top: 10px; }
-.live-all-sources a { color: #055eda; overflow-wrap: anywhere; }
 .live-article-list { display: grid; gap: 16px; max-height: 560px; overflow-y: auto; padding-right: 5px; }
 .live-article-card { background: #f4f8ff; border: 1px solid #e2ebf8; border-radius: 14px; padding: 20px; }
 .live-article-heading { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; color: #7890b3; font-size: 11px; }
@@ -282,7 +275,6 @@
 .live-source-list > div { display: grid; gap: 5px; border-bottom: 1px solid #e1eaf6; padding-bottom: 13px; }
 .live-source-list span { color: #8194b1; font-size: 11px; }
 @media (max-width: 700px) {
-  .live-research-panel .reference-section-head { flex-wrap: wrap; }
   .live-article-list { max-height: none; }
 }
 
@@ -318,11 +310,6 @@
 .analysis-outcome { min-height: 300px; background: linear-gradient(145deg, #fff, #f2f8ff); }
 .analysis-meter { width: 124px; height: 124px; }
 .analysis-page .reference-bottom-action { position: sticky; bottom: 10px; z-index: 4; }
-.live-research-panel { padding: 12px 19px; margin: 12px 0; border-radius: 11px; }
-.live-research-panel h2 { font-size: 15px; }
-.live-research-panel .reference-section-head { align-items: center; margin-bottom: 0; }
-.live-research-panel .muted { margin: 5px 0; font-size: 11px; }
-.live-all-sources { margin-top: 5px; }
 .event-workspace { grid-template-columns: minmax(0, .95fr) minmax(0, 1.1fr); gap: 17px; margin-top: 15px; }
 .event-workspace .reference-main-card { box-shadow: none; }
 .event-list, .event-detail { padding: 22px; }

@@ -77,10 +77,10 @@ export default function App() {
       analysisRunning.current = false;
     }
   }
-  async function fetchResearch(retryAnalysis = false, refreshSearch = false) {
+  async function fetchResearch() {
     if (researchBusy) return;
     setResearchBusy(true); setResearchError('');
-    try { setLiveResearch(await api(refreshSearch ? '/research/live?refreshSearch=true' : retryAnalysis ? '/research/live?retryAnalysis=true' : '/research/live', {})); setResearchSkipped(false); }
+    try { setLiveResearch(await api('/research/live', {})); setResearchSkipped(false); }
     catch (error) { setResearchError(error.message); }
     finally { setResearchBusy(false); }
   }
@@ -138,13 +138,11 @@ export default function App() {
       {stage === 'assets' && <AssetDashboard portfolio={portfolio} onStart={() => startAnalysis()} busy={calculating || researchBusy}/>}
       {stage === 'analysis' && <AnalysisStep portfolio={portfolio} comparison={comparison} calculationBusy={calculating} calculationError={calculationError} liveResearch={liveResearch} researchBusy={researchBusy} researchError={researchError} onContinue={() => navigate('events')} onRetry={() => startAnalysis(true)} onContinueWithoutResearch={() => { setResearchSkipped(true); navigate('events'); }}/>}
       {stage === 'events' && <EventExplorer
-        portfolio={portfolio} liveResearch={liveResearch} researchBusy={researchBusy} researchError={researchError}
-        onResearch={() => fetchResearch(false, true)} selectedSymbol={symbol}
+        portfolio={portfolio} liveResearch={liveResearch} researchBusy={researchBusy} selectedSymbol={symbol}
         onSelectSymbol={next => { resetConversation(draft); setSymbol(next); }}
         onChat={async () => { if (!liveResearch) await fetchResearch(); navigate('conditions'); }}/>
       }
       {['conditions', 'scenarios', 'report'].includes(stage) && <QuestionLanding portfolio={portfolio} conditions={draft}/>}
-      <div className="demo-banner flow-demo-note"><Icon name="info" size={17}/><span>가상 계좌·가격·환율을 사용하는 시연입니다. 실제 거래나 세금 신고는 실행하지 않습니다.</span></div>
       <footer className="service-footer"><span>우리투자증권 · 해커톤 프로토타입</span><button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>↑ TOP</button></footer>
     </main>
     {modal && <div className="reference-modal-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) navigate('events'); }}><section className={'reference-modal reference-modal-' + stage} role="dialog" aria-modal="true" aria-label={stage === 'conditions' ? 'AI 맞춤 절세 상담' : stage === 'scenarios' ? '절세 시나리오 비교' : '최종 보고서'}>

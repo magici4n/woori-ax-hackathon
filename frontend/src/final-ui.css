@@ -22,7 +22,7 @@
 .flow-stage-conditions .reference-main, .flow-stage-scenarios .reference-main,
 .flow-stage-report .reference-main { padding-left: 280px; }
 .reference-breadcrumb { padding: 23px 0 20px; font-size: 13px; color: #7283a7; }
-.reference-journey { left: max(0px, calc((100vw - 1920px) / 2)); top: 82px; width: 230px; padding: 84px 22px 24px 42px; background: linear-gradient(165deg, #f8fbff, #eef6ffcc); border-color: #e1edfc; }
+.reference-journey { left: max(0px, calc((100vw - 1920px) / 2)); top: 82px; width: 230px; padding: 84px 22px 24px 42px; background: transparent; border: 0; }
 .reference-journey button { min-height: 98px; gap: 17px; }
 .reference-journey button strong { font-size: 16px; color: #7785a6; }
 .reference-journey button>span { width: 24px; height: 24px; flex-basis: 24px; background: #adb8d0; border: 0; }
@@ -78,22 +78,18 @@
 .analysis-outcome .error-text ul { padding-left: 18px; }
 .analysis-page .reference-bottom-action { position: static; margin-top: 5px; }
 .analysis-page .reference-bottom-action .primary { min-width: 310px; }
-.events-page .reference-hero { min-height: 240px; padding: 28px 0 40px; margin-bottom: 20px; }
+.events-page .reference-hero { min-height: 240px; padding: 28px 0 40px; margin-bottom: 28px; }
+.events-page .reference-hero::before { bottom: 0; }
+.events-page .reference-hero::after { display: none; }
 .events-page .reference-hero-copy { max-width: 100%; }
 .events-page .reference-hero h1 { font-size: clamp(29px, 2.5vw, 43px); }
 .events-page .reference-hero p { max-width: 800px; font-size: 16px; }
-.live-research-panel { margin: 0 0 20px; padding: 15px 20px; background: #ffffffb3; border-radius: 12px; box-shadow: none; }
-.live-research-panel h2 { font-size: 16px; }
-.live-research-panel .reference-section-head p { font-size: 12px; margin-top: 3px; }
-.live-research-panel .muted { font-size: 11px; }
-.live-all-sources { font-size: 11px; }
-.live-all-sources summary { cursor: pointer; color: #5375a3; }
-.event-workspace { grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr); gap: 30px; margin: 0; background: #ffffffc9; border: 1px solid #ecf1fa; border-radius: 16px; padding: 24px; }
+.event-workspace { grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr); gap: 30px; margin: 0; background: #fff; border: 1px solid #ecf1fa; border-radius: 16px; padding: 24px; }
 .event-workspace .reference-main-card { padding: 0; border: 0; background: transparent; box-shadow: none; }
 .event-list .reference-section-head h2 { font-size: 21px; }
 .event-list .reference-section-head p { font-size: 12px; margin-top: 5px; }
 .event-search-field { display: flex; align-items: center; border: 1px solid #dce7f8; border-radius: 10px; background: #fff; padding: 0 12px; gap: 8px; box-shadow: 0 1px 3px #255aab08; }
-.event-search-field>span { font-size: 27px; line-height: 1; color: #8d9cba; }
+.event-search-field>svg { flex: none; color: #8d9cba; }
 .event-search-field:focus-within { outline: 2px solid #75b6ff; outline-offset: 2px; }
 .event-search { border: 0; padding: 10px 0; font-size: 13px; background: none; min-width: 0; }
 .event-search:focus-visible { outline: none; }
@@ -283,7 +279,6 @@
 .report-actions { flex-wrap: wrap; margin-top: 22px; }
 .report-actions .primary { border-radius: 11px; }
 .reference-app .service-footer { color: #8494b1; margin-top: 15px; }
-.reference-app .flow-demo-note { font-size: 11px; color: #7b8dab; background: #f5f9ff; border-color: #e6effa; }
 
 @media (min-width: 1650px) {
   .reference-modal-content { padding: 30px 40px; }
@@ -406,9 +401,6 @@
   .events-page .reference-hero { min-height: 210px; }
   .events-page .reference-hero h1 { font-size: 28px; }
   .events-page .reference-hero p { font-size: 13px; }
-  .live-research-panel { padding: 15px; }
-  .live-research-panel .reference-section-head { align-items: start; flex-direction: column; gap: 10px; }
-  .live-research-panel .button { min-height: 37px; font-size: 12px; }
   .event-workspace { padding: 17px; gap: 25px; }
   .event-rows { grid-template-columns: 1fr; }
   .event-row { grid-template-columns: 32px minmax(70px, 1fr) minmax(105px, 1fr) 10px; padding: 12px 6px; }

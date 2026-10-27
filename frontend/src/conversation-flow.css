@@ -117,7 +117,6 @@
 .results-stage .future-numbers { display: block; }
 .results-stage .future-row { flex-direction: row; font-size: 12px; }
 .results-stage .future-row strong { font-size: 15px; }
-.flow-demo-note { margin-top: 32px; margin-bottom: 15px; }
 .flow-app .service-footer { margin-top: 30px; }
 
 @media (max-width: 1000px) {

@@ -20,6 +20,7 @@ export function Icon({ name, size = 20, ...props }) {
     check: <path d="m5 12 4 4L19 6"/>,
     shield: <><path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6l-8-3Z"/><path d="m8 12 3 3 5-5"/></>,
     info: <><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7v1"/></>,
+    search: <><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></>,
     book: <><path d="M12 5v16M3 4c4-1 6 0 9 1 3-1 5-2 9-1v15c-4-1-6 0-9 1-3-1-5-2-9-1V4Z"/></>,
     send: <><path d="m3 3 19 9-19 9 4-9-4-9Zm4 9h15"/></>,
     close: <path d="m6 6 12 12M18 6 6 18"/>,
@@ -27,7 +28,11 @@ export function Icon({ name, size = 20, ...props }) {
   };
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>{paths[name] || paths.info}</svg>;
 }
-export function StockMark({ symbol }) { return <span className={'stock-mark ' + symbol}>{{ AAPL: 'a', MSFT: 'M', NVDA: 'N', INTC: 'i', NKE: '✓', TSLA: 'T' }[symbol] || symbol?.[0]}</span>; }
+const stockLogos = { AAPL: 'aapl', MSFT: 'msft', NVDA: 'nvda', INTC: 'intc', NKE: 'nke', TSLA: 'tsla' };
+export function StockMark({ symbol }) {
+  const logo = stockLogos[symbol];
+  return <span className={'stock-mark ' + symbol} aria-hidden="true">{logo ? <img src={`/logos/${logo}.svg`} alt="" loading="lazy"/> : symbol?.[0]}</span>;
+}
 export function ConditionText({ symbol, condition }) {
   return <>{names[symbol]} · {condition.excluded ? '매도 제외' : [condition.maxShares != null ? `최대 ${condition.maxShares}주` : '', condition.maxPercent != null ? `최대 ${condition.maxPercent}%` : ''].filter(Boolean).join(' / ') || '제한 없음'}</>;
 }

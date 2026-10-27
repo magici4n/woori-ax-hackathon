@@ -54,7 +54,6 @@ export function AnalysisStep({ portfolio, comparison, calculationBusy, calculati
       <li className={complete ? 'done' : ''}><strong>보유 종목 종합 분석 {liveResearch ? `${stockAnalysisCount}/${stockCount}개` : ''}</strong><small>기업 자료를 종합해 보유·매도 검토 포인트를 확인합니다.</small></li>
     </ol></section><section className="reference-main-card analysis-outcome" role="status" aria-live="polite" aria-busy={working}><span className={'analysis-meter ' + (working ? 'spinning' : failed || partial ? 'needs-attention' : '')}>{status}</span><h2>{heading}</h2><p>{detail}</p>{warnings.length > 0 && <div role="alert" className="error-text"><strong>완료하지 못한 단계</strong><ul>{warnings.map((warning, index) => <li key={index}>{warning}</li>)}</ul></div>}</section></div>
     <div className="reference-bottom-action">{complete || partial ? <button className="button primary" onClick={onContinue}>기업 자료 확인하기 <Icon name="arrow" size={18}/></button> : null}{!complete && <button className={partial ? 'button light' : 'button primary'} disabled={working} onClick={onRetry}>{working ? '자료를 준비하고 있어요…' : '기사 다시 검색·분석'} <Icon name="arrow" size={18}/></button>}{failed && comparison && !liveResearch && <button className="button light analysis-skip" onClick={onContinueWithoutResearch}>자료 없이 계속</button>}</div>
-    <p className="reference-footnote">검색 자료와 AI 분석은 출처 원문을 함께 확인해 주세요. 이 화면의 세금 계산은 시연 계좌 기준입니다.</p>
   </div>;
 }
 
