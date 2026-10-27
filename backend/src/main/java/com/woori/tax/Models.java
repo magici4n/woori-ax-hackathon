@@ -50,8 +50,9 @@ public final class Models {
                             List<String> questions, String message, String mode) {}
     public record ConditionPatch(String symbol, Boolean excluded, Integer maxShares, BigDecimal maxPercent) {}
     public record ExplainRequest(String symbol, Conditions conditions, Integer customQuantity) {}
-    public record SimulationRequest(Conditions conditions, String decisionPriority) {
-        public SimulationRequest(Conditions conditions) { this(conditions, null); }
+    public record SimulationRequest(Conditions conditions, String decisionPriority, String conversationId) {
+        public SimulationRequest(Conditions conditions) { this(conditions, null, null); }
+        public SimulationRequest(Conditions conditions, String decisionPriority) { this(conditions, decisionPriority, null); }
     }
     public record HoldingPlan(String symbol, String name, int quantity, int sellQuantity, int remainingQuantity,
                               BigDecimal realizedGainKrw, String reason) {}

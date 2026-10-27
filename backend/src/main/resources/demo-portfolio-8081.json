@@ -453,25 +453,25 @@
     "accountId" : "A1",
     "ticker" : "INTC",
     "quantity" : 40,
-    "principalUsd" : 1939.406291040032,
-    "principalKrw" : 2554400.000000000040,
-    "costKrw" : 2554400.000000000040,
+    "principalUsd" : 2150.94,
+    "principalKrw" : 2833000,
+    "costKrw" : 2833000,
     "priceUsd" : 30
   }, {
     "accountId" : "A2",
     "ticker" : "NKE",
     "quantity" : 20,
-    "principalUsd" : 1945.935767278268,
-    "principalKrw" : 2563000.000000002920,
-    "costKrw" : 2563000.000000002920,
+    "principalUsd" : 2460.71,
+    "principalKrw" : 3241000,
+    "costKrw" : 3241000,
     "priceUsd" : 75
   }, {
     "accountId" : "A3",
     "ticker" : "TSLA",
     "quantity" : 20,
-    "principalUsd" : 5819.737355966196,
-    "principalKrw" : 7665199.999999998408,
-    "costKrw" : 7665199.999999998408,
+    "principalUsd" : 6726.90,
+    "principalKrw" : 8860000,
+    "costKrw" : 8860000,
     "priceUsd" : 230
   } ],
   "snapshots" : {

@@ -56,13 +56,32 @@ export function QuestionLanding({ portfolio, conditions }) {
   return <div className="question-landing"><section className="reference-hero compact"><div className="reference-hero-copy"><span className="reference-kicker">WON AI 맞춤 종목 상담</span><h1>어떤 주식을 남기고,<br/><em>어떤 주식을 매도할지 고민되시나요?</em></h1><p>AI와 대화하며 보유 의사와 필요한 현금, 매도 가능한 범위를 정리하고 나에게 맞는 절세 시나리오를 살펴보세요.</p></div><div className="reference-hero-art" aria-hidden="true"><span className="hero-chart">✦</span><div className="hero-paper"><strong>AI 상담</strong><i/><i/><i/></div></div></section><div className="question-landing-cards"><section className="reference-main-card"><h2>현재 보유 중인 종목</h2><div className="question-stock-list">{heldSymbols(portfolio).map(symbol => <span key={symbol}><StockMark symbol={symbol}/>{names[symbol] || symbol}</span>)}</div></section><section className="reference-main-card"><h2>지금까지 정한 조건</h2><p>{preferred.length ? `${preferred.map(symbol => names[symbol] || symbol).join(', ')} 매도 제외` : '아직 매도 제외 종목을 정하지 않았어요.'}</p><p>{conditions.cashNeedKrw != null ? `필요 현금 ${won(conditions.cashNeedKrw)}` : '필요 현금은 대화 중에 알려주셔도 됩니다.'}</p></section></div></div>;
 }
 
+export function ScenarioLoading() {
+  return <section className="scenario-generation-state" role="status" aria-live="polite" aria-busy="true">
+    <span className="scenario-loading-orb" aria-hidden="true"><Icon name="spark" size={34}/></span>
+    <span className="reference-kicker">AI 맞춤 절세 시나리오</span>
+    <h2>나에게 맞는 절세 시나리오를<br/>만들고 있어요.</h2>
+    <p>대화 내용과 기사·공시를 바탕으로<br/>매도 조건과 세금 효과를 함께 검토하고 있습니다.</p>
+    <div className="scenario-loading-context" aria-hidden="true"><span>나의 투자 의사</span><span>기업 자료</span><span>세금 효과</span></div>
+  </section>;
+}
+
+export function ScenarioFailure({ message, onRetry, onShowBasic }) {
+  return <section className="scenario-generation-state scenario-generation-failure" role="alert">
+    <span className="scenario-failure-icon" aria-hidden="true"><Icon name="info" size={30}/></span>
+    <h2>맞춤 시나리오를 완성하지 못했어요.</h2>
+    <p>{message || '잠시 후 다시 시도해 주세요.'}</p>
+    <div className="scenario-generation-actions"><button className="button primary" onClick={onRetry}>다시 시도</button>{onShowBasic && <button className="button light" onClick={onShowBasic}>기본 계산안 보기</button>}</div>
+  </section>;
+}
+
 export function ScenarioChooser({ comparison, assessment, assessBusy, conditions, selectedId, onSelect, onReport, onEdit, onRetry }) {
   const scenarios = comparison?.scenarios || [];
   const selected = scenarios.find(item => item.id === selectedId) || scenarios[1] || scenarios[0];
   const live = assessment?.mode === 'live';
   const chosenSources = live ? assessment.research.sources.filter(source => (assessment.scenarioSourceIds?.[selected?.id] || []).includes(source.id)) : [];
-  return <div className="scenario-choice"><span className="reference-kicker">나에게 맞는 절세 시나리오</span><h2>조건을 반영한 시나리오를 비교해 보세요.</h2><p className="scenario-choice-intro">{assessBusy ? 'Java 계산 결과를 먼저 보여드립니다. AI가 기업 자료를 검색하고 전략을 제안하고 있어요.' : live ? 'AI가 출처가 있는 자료로 전략을 제안했고, Java가 수량과 세액을 검증했습니다.' : assessment?.message || '현재는 Java 계산 기준의 비교 결과입니다.'}</p>
-    {assessment?.mode === 'unavailable' && <button className="button light" onClick={onRetry}>AI 자료 조사 다시 시도</button>}
+  return <div className="scenario-choice"><span className="reference-kicker">나에게 맞는 절세 시나리오</span><h2>조건을 반영한 시나리오를 비교해 보세요.</h2><p className="scenario-choice-intro">{live ? 'AI가 대화 내용과 출처가 있는 자료로 전략을 제안했고, 매도 수량과 세액을 검증했습니다.' : assessment?.mode === 'unavailable' ? `AI 시나리오를 생성하지 못해 기본 계산안을 표시합니다. ${assessment.message}` : assessment?.message || '현재는 기본 계산 기준의 비교 결과입니다.'}</p>
+    {assessment?.mode === 'unavailable' && <button className="button light" onClick={onRetry}>AI 시나리오 생성 다시 시도</button>}
     <div className="reference-scenario-cards">{scenarios.map((scenario, index) => { const sales = scenario.holdings.filter(holding => holding.sellQuantity > 0); const chosen = scenario.id === selected?.id; return <button key={scenario.id} className={'reference-scenario-card ' + (chosen ? 'chosen ' : '') + (live && scenario.id === 'balanced' ? 'recommended' : '')} onClick={() => onSelect(scenario.id)} aria-pressed={chosen}><span className="scenario-card-top"><span>시나리오 {index + 1}</span><span>{scenario.retainedPercent}% 보유</span></span><strong>{scenario.title}</strong><span className="sale-line">{sales.length ? sales.map(holding => `${holding.name} ${holding.sellQuantity}주`).join(' · ') + ' 매도' : '모든 종목 그대로 보유'}</span><span className="saving-label">예상 세금 감소</span><b>{won(scenario.taxReductionKrw)}</b><span className="scenario-card-metrics"><span>올해 예상 세금 <strong>{won(scenario.estimatedTaxKrw)}</strong></span><span>추가 매도 비용 <strong>{won(scenario.saleFeeKrw)}</strong></span><span>실현하는 손익 <strong>{signedWon(scenario.realizedGainKrw)}</strong></span></span>{live && scenario.id === 'balanced' && <em className="recommend-mark">★ AI 추천</em>}{scenario.duplicateOf && <small>다른 시나리오와 매도 수량이 같습니다.</small>}</button>; })}</div>
     {selected && <section className="reference-selected-detail"><div><span className="reference-kicker">선택한 안의 근거</span><h3>{selected.title}</h3><p>{selected.reason}</p><p className="muted">{selected.tradeoff}</p>{conditions.cashNeedKrw != null && <p>필요 현금 {won(conditions.cashNeedKrw)} 중 {won(selected.cashKrw)} 확보 · {Number(selected.cashKrw) >= Number(conditions.cashNeedKrw) ? '목표 충족' : '목표 미달'}</p>}{conditions.holdingMonths != null && <p>보유 계획 {conditions.holdingMonths}개월 · {live ? 'AI 전략 제안에 고려' : '기본 계산에는 미반영'}</p>}{chosenSources.length > 0 && <div className="reference-source-links">{chosenSources.map(source => <a key={source.id} href={source.url} target="_blank" rel="noreferrer">{source.title} ↗</a>)}</div>}</div><div className="table-scroll"><table><thead><tr><th>종목</th><th>매도</th><th>계속 보유</th><th>선택 이유</th></tr></thead><tbody>{selected.holdings.map(holding => <tr key={holding.symbol}><td>{holding.name}</td><td>{holding.sellQuantity}주</td><td>{holding.remainingQuantity}주</td><td>{assessment?.stockReasons?.[selected.id]?.[holding.symbol] || holding.reason}</td></tr>)}</tbody></table></div></section>}
     <div className="scenario-choice-actions"><button className="button light" onClick={onEdit}>조건 수정</button><button className="button primary" disabled={!selected || assessBusy} onClick={onReport}>선택한 안으로 보고서 보기 <Icon name="arrow" size={18}/></button></div>

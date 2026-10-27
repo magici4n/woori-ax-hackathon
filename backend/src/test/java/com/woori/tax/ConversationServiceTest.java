@@ -25,8 +25,11 @@ class ConversationServiceTest {
     @Test void sessionsExpireAndQuestionsCannotBeRevived() {
         var clock = new MutableClock(); var service = new ConversationService(clock);
         var old = service.getContext(null, "TSLA");
+        service.appendMessage(old, "user", "테슬라는 계속 보유하고 싶어요.");
+        assertThat(service.recentMessages(old.id())).hasSize(1);
         service.setPendingQuestion(old, new ConditionPatch("TSLA", true, null, null), "제외할까요?");
         clock.now = clock.now.plus(Duration.ofMinutes(31));
+        assertThat(service.recentMessages(old.id())).isEmpty();
         var fresh = service.getContext(old.id(), "TSLA");
         assertThat(fresh.id()).isNotEqualTo(old.id());
         assertThat(fresh.pending()).isNull();
@@ -35,6 +38,8 @@ class ConversationServiceTest {
         var service = new ConversationService();
         var first = service.getContext(null, "TSLA"); var second = service.getContext(null, "TSLA");
         for (int i = 0; i < 30; i++) service.appendMessage(first, "user", "message-" + i);
+        assertThat(service.recentMessages(first.id())).hasSize(12);
+        assertThat(service.recentMessages(second.id())).isEmpty();
         assertThat(first.history()).hasSize(12);
         assertThat(first.history().get(0).text()).isEqualTo("message-18");
         assertThat(second.history()).isEmpty();
@@ -43,6 +48,7 @@ class ConversationServiceTest {
         var service = new ConversationService();
         var first = service.getContext(null, "TSLA"); var second = service.getContext(null, "AAPL");
         service.reset(first.id());
+        assertThat(service.recentMessages(first.id())).isEmpty();
         assertThat(service.getContext(first.id(), "TSLA").id()).isNotEqualTo(first.id());
         assertThat(service.getContext(second.id(), "AAPL").id()).isEqualTo(second.id());
     }

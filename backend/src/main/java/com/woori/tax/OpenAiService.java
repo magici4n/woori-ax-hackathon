@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
@@ -37,34 +38,39 @@ public class OpenAiService {
     public record GroundedResult(String text, List<GroundingSource> sources, List<GroundingClaim> claims) {}
     private record TimedGrounding(GroundedResult result, Instant at) {}
 
+    @Autowired
     public OpenAiService(ObjectMapper mapper, @Value("${app.openai.key:}") String key,
                          @Value("${app.openai.model:gpt-6.1-sol}") String model,
                          @Value("${app.openai.max-output-tokens:3000}") int maxOutput) {
+        this(mapper, key, model, maxOutput, createClient());
+    }
+
+    OpenAiService(ObjectMapper mapper, String key, String model, int maxOutput, RestClient client) {
         this.mapper = mapper; this.key = key; this.model = model; this.maxOutput = maxOutput;
         if (!model.matches("[a-zA-Z0-9.\\-]{1,100}") || maxOutput < 100 || maxOutput > 6000)
             throw new IllegalArgumentException("OpenAI 설정값을 확인하세요.");
-        var factory = new JdkClientHttpRequestFactory(HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(8)).build());
-        factory.setReadTimeout(Duration.ofSeconds(90));
-        client = RestClient.builder().requestFactory(factory).baseUrl("https://api.openai.com").build();
+        this.client = client;
     }
 
-    public synchronized JsonNode json(String system, String prompt, String version) {
-        return jsonFormat(system, prompt, version, Map.of("type", "json_object"));
+    private static RestClient createClient() {
+        var factory = new JdkClientHttpRequestFactory(HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(8)).build());
+        factory.setReadTimeout(Duration.ofSeconds(90));
+        return RestClient.builder().requestFactory(factory).baseUrl("https://api.openai.com").build();
     }
 
     public synchronized JsonNode jsonSchema(String system, String prompt, String version, Map<String, Object> schema) {
         return jsonFormat(system, prompt, version,
-            Map.of("type", "json_schema", "name", "research_articles", "strict", true, "schema", schema));
+            Map.of("type", "json_schema", "name", "structured_response", "strict", true, "schema", schema));
     }
 
     private JsonNode jsonFormat(String system, String prompt, String version, Map<String, Object> format) {
         String cacheKey = model + version + system + prompt + format;
         if (cache.containsKey(cacheKey)) return cache.get(cacheKey).deepCopy();
-        if (prompt.length() + system.length() > 16000) throw new AiUnavailable("AI 입력 길이 한도를 초과했습니다.");
+        if (prompt.length() + system.length() > 64000) throw new AiUnavailable("AI 입력 길이 한도를 초과했습니다.");
         requireKey();
         try {
             JsonNode response = send(Map.of("model", model, "instructions", system, "input", prompt,
-                "store", false, "max_output_tokens", maxOutput,
+                "store", false, "max_output_tokens", maxOutput, "reasoning", Map.of("effort", "low"),
                 "text", Map.of("format", format)));
             JsonNode result = mapper.readTree(outputText(response));
             if (result == null || !result.isObject()) throw new AiUnavailable("AI 응답 형식을 확인할 수 없습니다.");
@@ -246,11 +252,25 @@ public class OpenAiService {
 
     private AiUnavailable providerFailure(RestClientResponseException e) {
         int status = e.getStatusCode().value();
+        String code = "", param = "";
+        try {
+            JsonNode error = mapper.readTree(e.getResponseBodyAsString()).path("error");
+            code = diagnosticField(error.path("code").asText(""));
+            param = diagnosticField(error.path("param").asText(""));
+        } catch (Exception ignored) { }
         if (status == 401) return new AiUnavailable("OpenAI 키가 유효하지 않습니다. 새 키 설정을 확인해 주세요.");
         if (status == 404) return new AiUnavailable("설정된 OpenAI 모델(" + model + ")을 사용할 수 없습니다.");
+        if (status == 400) return new AiUnavailable("OpenAI 요청 형식 오류 (HTTP 400)"
+            + (param.isEmpty() ? "" : " · 항목: " + param) + (code.isEmpty() ? "" : " · 코드: " + code) + ".");
+        if (status == 429 && "rate_limit_exceeded".equals(code))
+            return new AiUnavailable("OpenAI 요청 속도 한도에 도달했습니다. 잠시 후 다시 요청하세요.");
         if (status == 429) return new AiUnavailable("OpenAI 잔액 또는 호출 한도를 확인해 주세요.");
         if (status >= 500) return new AiUnavailable("OpenAI 응답 오류 (HTTP " + status + "). 검색 또는 분석 요청을 완료하지 못했습니다.");
         return new AiUnavailable("OpenAI 요청에 실패했습니다 (HTTP " + status + ").");
+    }
+
+    private String diagnosticField(String value) {
+        return value.matches("[a-zA-Z0-9_.\\[\\]-]{1,100}") && !value.startsWith("sk-") ? value : "";
     }
 
     static String connectionFailureMessage(Throwable error) {

@@ -47,7 +47,7 @@ public class AssistantService {
                 Conditions proposed = merge(existing, List.of(pending.proposal()), existing.targetReductionKrw());
                 return finish(context, existing, proposed, List.of(pending.proposal()), List.of(), "확인한 내용을 적용 예정 조건에 담았어요. 아래에서 확인하면 비교 결과를 볼 수 있어요.", "confirmation");
             } catch (IllegalArgumentException e) {
-                return finish(context, existing, existing, List.of(), List.of(), "기존 조건과 충돌하는 변경은 직접 설정에서 확인해 주세요.", "clarification");
+                return finish(context, existing, existing, List.of(), List.of(), "보유 수량 안에서 매도 가능한 범위를 다시 알려주세요.", "clarification");
             }
         }
         if (request.message().matches("(?s).*(사도\\s*돼|살까|매수해도|추천해|추천\\s*종목|목표가|주가.{0,8}전망|오를까|상승.{0,8}확률).*")) {
@@ -81,7 +81,12 @@ public class AssistantService {
                 '이 종목'은 선택 종목으로 해석하되 사용자가 명시한 종목을 항상 우선합니다.
                 기존 조건을 유지하며 이번 발화에서 명시한 제외·최대 정수 수량·비율·희망 세금 감소액(원)·필요 현금(원)·보유 계획(개월)만 추출하세요.
                 현금 금액과 기간은 사용자가 명시한 경우에만 숫자로 반환하세요. '장기' 등 모호한 표현은 개월 수로 추측하지 마세요.
-                기존 제외 해제나 매도 한도 완화는 직접 설정으로 안내하고 changes를 비우세요.
+                사용자가 명확히 요청하면 기존 매도 제외 해제와 매도 한도 변경도 대화에서 처리하세요. 직접 설정으로 안내하지 마세요.
+                '테슬라도 팔 수 있어', '테슬라 제외를 해제해'는 TSLA의 excluded를 false로 반환하세요. 언급하지 않은 종목의 조건은 유지하세요.
+                '인텔만 제외하고 나머지는 모두 매도 가능하게'처럼 범위가 명확하면 인텔은 excluded true, 나머지 보유 종목은 excluded false로 반환하세요.
+                null은 기존 값 유지입니다. 수량·비율 한도까지 없애 달라는 명확한 요청이면 maxShares는 해당 종목의 전체 보유 수량, maxPercent는 100으로 반환하세요.
+                새 수량 한도가 기존 비율 한도를 대체한다고 명확히 말하면 maxPercent를 100으로, 새 비율 한도가 기존 수량 한도를 대체하면 maxShares를 전체 보유 수량으로 반환하세요.
+                '더 팔까', '다시 생각해 볼래'처럼 변경 여부나 범위가 모호하면 changes는 비우고 questions로 확인하세요. 단일 조건이면 pendingQuestion에도 제안하세요.
                 최근 대화는 말뜻 해석용입니다. 명시적으로 취소하거나 거절한 조건을 되살리지 마세요.
                 '장기투자 중'만으로 매도 금지를 확정하지 마세요. 제외할지 질문하고 pendingQuestion에 제안을 기록하세요.
                 pendingQuestion은 정확히 한 가지 종목의 한 가지 조건을 확인할 때만 사용합니다. 숫자를 추측하지 마세요.
@@ -120,9 +125,9 @@ public class AssistantService {
             selection.put("symbol", request.selectedSymbol());
             selection.put("quantity", data.lots.stream().filter(l -> l.symbol().equals(request.selectedSymbol())).mapToInt(Lot::quantity).sum());
             selection.put("scope", "ALL_DEMO_ACCOUNTS"); input.put("currentSelection", selection);
-            JsonNode raw = ai.json(system, mapper.writeValueAsString(input), "conditions-v3-portfolio");
+            JsonNode raw = ai.jsonSchema(system, mapper.writeValueAsString(input), "conditions-v5-portfolio", AiSchemas.CONDITION_EXTRACTION);
             List<String> questions = strings(raw.path("questions"), 3);
-            if (!raw.path("changes").isArray() || raw.path("changes").size() > 4) throw new IllegalArgumentException("조건 응답 형식 오류");
+            if (!raw.path("changes").isArray() || raw.path("changes").size() > data.symbols().size()) throw new IllegalArgumentException("조건 응답 형식 오류");
             List<ConditionPatch> patches = new ArrayList<>();
             for (JsonNode change : raw.path("changes")) patches.add(mapper.treeToValue(change, ConditionPatch.class));
             String responseMessage = safeText(raw.path("message").asText("적용 예정 조건을 확인해 주세요."), 300);
@@ -156,18 +161,17 @@ public class AssistantService {
         } catch (OpenAiService.AiUnavailable e) {
             return finish(context, existing, existing, List.of(), List.of(), e.getMessage(), "unavailable");
         } catch (Exception e) {
-            return finish(context, existing, existing, List.of(), List.of(), "조건을 안전하게 확인할 수 없어요. 종목과 수량을 명확히 다시 입력하거나 직접 설정을 이용해 주세요.", "unavailable");
+            return finish(context, existing, existing, List.of(), List.of(), "조건을 확인할 수 없어요. 변경할 종목과 매도 가능한 수량·비율을 구체적으로 다시 알려주세요.", "unavailable");
         }
     }
     private Conditions merge(Conditions existing, List<ConditionPatch> patches, java.math.BigDecimal target) {
         Map<String,Condition> merged = new TreeMap<>(existing.symbols());
+        Set<String> changedSymbols = new HashSet<>();
         for (ConditionPatch p : patches) {
             if (p.symbol() == null || !data.symbols().contains(p.symbol())) throw new IllegalArgumentException("보유 종목을 확인하세요.");
+            if (!changedSymbols.add(p.symbol())) throw new IllegalArgumentException("같은 종목의 변경 조건이 중복되었습니다.");
             Condition before = merged.getOrDefault(p.symbol(), new Condition(false, null, null));
-            if (Boolean.FALSE.equals(p.excluded()) && before.excluded()) throw new IllegalArgumentException("기존 제외 조건을 해제할 수 없습니다.");
-            if (before.maxShares() != null && p.maxShares() != null && p.maxShares() > before.maxShares()) throw new IllegalArgumentException("최대 수량 완화는 직접 설정에서 확인하세요.");
-            if (before.maxPercent() != null && p.maxPercent() != null && p.maxPercent().compareTo(before.maxPercent()) > 0) throw new IllegalArgumentException("최대 비율 완화는 직접 설정에서 확인하세요.");
-            merged.put(p.symbol(), new Condition(Boolean.TRUE.equals(p.excluded()) || before.excluded(), p.maxShares() == null ? before.maxShares() : p.maxShares(), p.maxPercent() == null ? before.maxPercent() : p.maxPercent()));
+            merged.put(p.symbol(), new Condition(p.excluded() == null ? before.excluded() : p.excluded(), p.maxShares() == null ? before.maxShares() : p.maxShares(), p.maxPercent() == null ? before.maxPercent() : p.maxPercent()));
         }
         return calculations.validate(new Conditions(merged, target, existing.cashNeedKrw(), existing.holdingMonths()));
     }
@@ -201,7 +205,7 @@ public class AssistantService {
                 {"id":"balanced","text":"설명","sourceIds":["ID"]},{"id":"tax","text":"설명","sourceIds":["ID"]}]}
                 각 설명은 사용한 자료 ID를 포함해야 하며 동일한 문구를 반복하지 마세요.
                 """;
-            JsonNode raw = ai.json(system, mapper.writeValueAsString(Map.of("calculation", simulationContext(comparison), "retrievedEvidence", found)), evidence.version() + "-portfolio");
+            JsonNode raw = ai.jsonSchema(system, mapper.writeValueAsString(Map.of("calculation", simulationContext(comparison), "retrievedEvidence", found)), evidence.version() + "-portfolio", AiSchemas.PORTFOLIO_EXPLANATION);
             if (!raw.path("scenarios").isArray() || raw.path("scenarios").size() != 3) throw new IllegalArgumentException("설명 형식 오류");
             Set<String> expected = new HashSet<>(List.of("hold", "balanced", "tax"));
             Set<String> allowed = new HashSet<>(found.stream().map(Source::id).toList());
@@ -237,7 +241,7 @@ public class AssistantService {
                 종목 근거가 없으면 positive와 negative를 '해당 종목 근거 부족'으로 쓰세요.
                 과거 회사 자료는 당시 발표로 표현하고 최신 상태처럼 표현하지 마세요. 각 항목은 250자 이하로 작성하세요.
                 """;
-            JsonNode raw = ai.json(system, mapper.writeValueAsString(Map.of("calculation", result, "retrievedEvidence", found)), evidence.version());
+            JsonNode raw = ai.jsonSchema(system, mapper.writeValueAsString(Map.of("calculation", result, "retrievedEvidence", found)), evidence.version(), AiSchemas.SINGLE_EXPLANATION);
             List<String> ids = strings(raw.path("sourceIds"), 5);
             Set<String> allowed = new HashSet<>(found.stream().map(Source::id).toList());
             if (ids.isEmpty() || !allowed.containsAll(ids)) throw new IllegalArgumentException("근거 ID 오류");

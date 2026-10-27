@@ -3,14 +3,73 @@ package com.woori.tax;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClient;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 import java.net.http.HttpTimeoutException;
 import java.util.List;
+import java.util.Map;
+import java.util.HashSet;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
 
 class OpenAiServiceTest {
     private final ObjectMapper mapper = new ObjectMapper();
+
+    @Test void chatAndProposalRequestsUseStrictStructuredOutputs() throws Exception {
+        for (var schema : List.of(AiSchemas.CONDITION_EXTRACTION, AiSchemas.PORTFOLIO_PROPOSALS)) {
+            assertStrictObjects(mapper.valueToTree(schema));
+            var builder = RestClient.builder().baseUrl("https://api.openai.com");
+            var server = MockRestServiceServer.bindTo(builder).build();
+            var service = new OpenAiService(mapper, "test-key", "gpt-6.1-sol", 5000, builder.build());
+            var expected = Map.of("model", "gpt-6.1-sol", "instructions", "Return JSON.", "input", "{}",
+                "store", false, "max_output_tokens", 5000, "reasoning", Map.of("effort", "low"),
+                "text", Map.of("format", Map.of("type", "json_schema", "name", "structured_response", "strict", true, "schema", schema)));
+            server.expect(requestTo("https://api.openai.com/v1/responses"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(content().json(mapper.writeValueAsString(expected)))
+                .andRespond(withSuccess("""
+                    {"status":"completed","output":[{"type":"message","content":[{"type":"output_text","text":"{\\"ok\\":true}"}]}]}
+                    """, MediaType.APPLICATION_JSON));
+            assertThat(service.jsonSchema("Return JSON.", "{}", "contract", schema).path("ok").asBoolean()).isTrue();
+            server.verify();
+        }
+    }
+
+    @Test void badRequestReportsRejectedParameterWithoutProviderMessage() {
+        var builder = RestClient.builder().baseUrl("https://api.openai.com");
+        var server = MockRestServiceServer.bindTo(builder).build();
+        var service = new OpenAiService(mapper, "test-key", "gpt-6.1-sol", 5000, builder.build());
+        server.expect(requestTo("https://api.openai.com/v1/responses"))
+            .andRespond(withStatus(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).body("""
+                {"error":{"message":"raw provider request with secret data","code":"unsupported_value","param":"text.format"}}
+                """));
+        assertThatThrownBy(() -> service.jsonSchema("Return JSON.", "{}", "error", AiSchemas.CONDITION_EXTRACTION))
+            .isInstanceOf(OpenAiService.AiUnavailable.class).hasMessageContaining("HTTP 400")
+            .hasMessageContaining("text.format").hasMessageContaining("unsupported_value")
+            .hasMessageNotContaining("secret data").hasMessageNotContaining("test-key");
+        server.verify();
+    }
+
+    private void assertStrictObjects(com.fasterxml.jackson.databind.JsonNode schema) {
+        if ("object".equals(schema.path("type").asText())) {
+            assertThat(schema.path("additionalProperties").isBoolean()).isTrue();
+            assertThat(schema.path("additionalProperties").asBoolean()).isFalse();
+            var fields = new HashSet<String>();
+            schema.path("properties").fieldNames().forEachRemaining(fields::add);
+            var required = new HashSet<String>();
+            schema.path("required").forEach(field -> required.add(field.asText()));
+            assertThat(required).isEqualTo(fields);
+            schema.path("properties").forEach(this::assertStrictObjects);
+        }
+        if (schema.has("items")) assertStrictObjects(schema.path("items"));
+        schema.path("anyOf").forEach(this::assertStrictObjects);
+    }
 
     @Test void readsMessageAfterReasoningOutput() throws Exception {
         var response = mapper.readTree("""

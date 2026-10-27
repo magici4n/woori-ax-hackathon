@@ -67,6 +67,18 @@ public class ConversationService {
     public void clearPendingQuestion(Context context) { synchronized (context) { context.pending = null; } }
     public synchronized void reset(String id) { sessions.remove(id); }
 
+    public List<ConversationMessage> recentMessages(String id) {
+        Context context;
+        synchronized (this) {
+            if (id == null) return List.of();
+            if (!id.matches("[a-fA-F0-9-]{36}")) throw new IllegalArgumentException("대화 ID 형식이 올바르지 않습니다.");
+            context = sessions.get(id);
+            if (context == null || Duration.between(context.accessedAt, clock.instant()).compareTo(TTL) >= 0)
+                return List.of();
+        }
+        return context.history();
+    }
+
     /** 짧고 명확한 긍정/부정만 처리합니다. 종목·수량을 덧붙인 문장은 AI 검증 경로로 보냅니다. */
     public Optional<Boolean> resolvePendingAnswer(Context context, String message) {
         String normalized = message.replaceAll("[\\s.!?,。！？]", "");

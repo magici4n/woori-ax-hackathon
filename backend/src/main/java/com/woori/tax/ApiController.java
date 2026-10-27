@@ -51,7 +51,7 @@ public class ApiController {
     @PostMapping("/conditions/extract") public Map<String,Object> extract(@RequestBody ExtractRequest request) { return assistant.extract(request); }
     @DeleteMapping("/conversations/{id}") public Map<String,String> resetConversation(@PathVariable String id) {
         conversations.reset(id);
-        return Map.of("message", "대화가 초기화되었습니다. 적용 중인 조건은 유지됩니다.");
+        return Map.of("message", "대화 기록이 삭제되었습니다.");
     }
     @PostMapping("/explain") public Map<String,Object> explain(@RequestBody ExplainRequest request) { return assistant.explain(request); }
     @GetMapping("/evidence") public List<Source> evidence(@RequestParam String symbol) {
