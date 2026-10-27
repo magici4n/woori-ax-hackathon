@@ -55,7 +55,7 @@ public class PortfolioSimulationService {
         if (maxReduction.signum() == 0) notices.add("현재 조건에서는 추가 절세가 없어 세 시나리오가 같을 수 있습니다.");
         if (conditions.targetReductionKrw() != null && maxReduction.compareTo(conditions.targetReductionKrw()) < 0)
             notices.add("지정한 매도 제한을 지키면 희망 감소액에 도달할 수 없습니다. 가능한 최대 감소액은 " + maxReduction.toPlainString() + "원입니다.");
-        notices.add("원화 세무상 손실을 실현하는 조합을 비교합니다. 같은 종목은 시연 계좌 A→B 순서로 매도하며 계좌 선택 최적화는 하지 않습니다.");
+        notices.add("원화 세무상 손실을 실현하는 조합을 비교합니다. 같은 종목은 데이터에 저장된 계좌 순서로 매도하며 계좌 선택 최적화는 하지 않습니다.");
         notices.add("기업 자료는 보유·매도의 기회와 위험을 이해하는 참고 정보입니다. 시나리오 수량은 가격 전망 점수가 아닌 손익·세금·매도 한도로 계산합니다.");
         return new PortfolioComparison(baseline, maxReduction, conditions, data.rule, scenarios, notices);
     }

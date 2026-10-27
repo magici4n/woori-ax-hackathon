@@ -1,0 +1,1157 @@
+{
+  "version" : 1,
+  "connected" : true,
+  "asOf" : "2026-10-26",
+  "pnlMode" : "SNAPSHOT",
+  "accounts" : [ {
+    "id" : "A1",
+    "broker" : "가상 키움증권",
+    "krwCash" : 600000,
+    "usdCash" : 0,
+    "orderableKrw" : 600000,
+    "orderableUsd" : 0,
+    "fxConvertibleKrw" : 600000,
+    "withdrawableKrw" : 600000,
+    "snapshotPnlKrw" : 1800000
+  }, {
+    "id" : "A2",
+    "broker" : "가상 토스증권",
+    "krwCash" : 300000,
+    "usdCash" : 20,
+    "orderableKrw" : 300000,
+    "orderableUsd" : 20,
+    "fxConvertibleKrw" : 300000,
+    "withdrawableKrw" : 300000,
+    "snapshotPnlKrw" : 1400000
+  }, {
+    "id" : "A3",
+    "broker" : "가상 미래에셋증권",
+    "krwCash" : 500000,
+    "usdCash" : 0,
+    "orderableKrw" : 500000,
+    "orderableUsd" : 0,
+    "fxConvertibleKrw" : 500000,
+    "withdrawableKrw" : 500000,
+    "snapshotPnlKrw" : 2000000
+  } ],
+  "trades" : [ {
+    "id" : "BUY-AAPL-1",
+    "accountId" : "A1",
+    "ticker" : "AAPL",
+    "side" : "BUY",
+    "quantity" : 10,
+    "priceUsd" : 114.678899082569,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-01-05",
+    "settlementDate" : "2026-01-05",
+    "fxEffectiveDate" : "2026-01-05",
+    "taxFx" : 1308,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-AAPL-2",
+    "accountId" : "A1",
+    "ticker" : "AAPL",
+    "side" : "BUY",
+    "quantity" : 10,
+    "priceUsd" : 112.275449101796,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-02-02",
+    "settlementDate" : "2026-02-02",
+    "fxEffectiveDate" : "2026-02-02",
+    "taxFx" : 1336,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-AAPL-3",
+    "accountId" : "A1",
+    "ticker" : "AAPL",
+    "side" : "BUY",
+    "quantity" : 10,
+    "priceUsd" : 109.970674486804,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-03-02",
+    "settlementDate" : "2026-03-02",
+    "fxEffectiveDate" : "2026-03-02",
+    "taxFx" : 1364,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-AAPL-4",
+    "accountId" : "A1",
+    "ticker" : "AAPL",
+    "side" : "BUY",
+    "quantity" : 10,
+    "priceUsd" : 117.739403453689,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-04-01",
+    "settlementDate" : "2026-04-01",
+    "fxEffectiveDate" : "2026-04-01",
+    "taxFx" : 1274,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-MSFT-1",
+    "accountId" : "A2",
+    "ticker" : "MSFT",
+    "side" : "BUY",
+    "quantity" : 5,
+    "priceUsd" : 203.873598369011,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-01-05",
+    "settlementDate" : "2026-01-05",
+    "fxEffectiveDate" : "2026-01-05",
+    "taxFx" : 1308,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-MSFT-2",
+    "accountId" : "A2",
+    "ticker" : "MSFT",
+    "side" : "BUY",
+    "quantity" : 5,
+    "priceUsd" : 199.600798403194,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-02-02",
+    "settlementDate" : "2026-02-02",
+    "fxEffectiveDate" : "2026-02-02",
+    "taxFx" : 1336,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-MSFT-3",
+    "accountId" : "A2",
+    "ticker" : "MSFT",
+    "side" : "BUY",
+    "quantity" : 10,
+    "priceUsd" : 195.503421309873,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-03-02",
+    "settlementDate" : "2026-03-02",
+    "fxEffectiveDate" : "2026-03-02",
+    "taxFx" : 1364,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-MSFT-4",
+    "accountId" : "A2",
+    "ticker" : "MSFT",
+    "side" : "BUY",
+    "quantity" : 10,
+    "priceUsd" : 209.314495028781,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-04-01",
+    "settlementDate" : "2026-04-01",
+    "fxEffectiveDate" : "2026-04-01",
+    "taxFx" : 1274,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-NVDA-1",
+    "accountId" : "A3",
+    "ticker" : "NVDA",
+    "side" : "BUY",
+    "quantity" : 10,
+    "priceUsd" : 152.905198776758,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-01-05",
+    "settlementDate" : "2026-01-05",
+    "fxEffectiveDate" : "2026-01-05",
+    "taxFx" : 1308,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-NVDA-2",
+    "accountId" : "A3",
+    "ticker" : "NVDA",
+    "side" : "BUY",
+    "quantity" : 10,
+    "priceUsd" : 149.700598802395,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-02-02",
+    "settlementDate" : "2026-02-02",
+    "fxEffectiveDate" : "2026-02-02",
+    "taxFx" : 1336,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-NVDA-3",
+    "accountId" : "A3",
+    "ticker" : "NVDA",
+    "side" : "BUY",
+    "quantity" : 15,
+    "priceUsd" : 146.627565982405,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-03-02",
+    "settlementDate" : "2026-03-02",
+    "fxEffectiveDate" : "2026-03-02",
+    "taxFx" : 1364,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-NVDA-4",
+    "accountId" : "A3",
+    "ticker" : "NVDA",
+    "side" : "BUY",
+    "quantity" : 15,
+    "priceUsd" : 156.985871271586,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-04-01",
+    "settlementDate" : "2026-04-01",
+    "fxEffectiveDate" : "2026-04-01",
+    "taxFx" : 1274,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-INTC-1",
+    "accountId" : "A1",
+    "ticker" : "INTC",
+    "side" : "BUY",
+    "quantity" : 8,
+    "priceUsd" : 48.822629969419,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-01-05",
+    "settlementDate" : "2026-01-05",
+    "fxEffectiveDate" : "2026-01-05",
+    "taxFx" : 1308,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-INTC-2",
+    "accountId" : "A1",
+    "ticker" : "INTC",
+    "side" : "BUY",
+    "quantity" : 8,
+    "priceUsd" : 47.799401197605,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-02-02",
+    "settlementDate" : "2026-02-02",
+    "fxEffectiveDate" : "2026-02-02",
+    "taxFx" : 1336,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-INTC-3",
+    "accountId" : "A1",
+    "ticker" : "INTC",
+    "side" : "BUY",
+    "quantity" : 8,
+    "priceUsd" : 46.818181818182,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-03-02",
+    "settlementDate" : "2026-03-02",
+    "fxEffectiveDate" : "2026-03-02",
+    "taxFx" : 1364,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-INTC-4",
+    "accountId" : "A1",
+    "ticker" : "INTC",
+    "side" : "BUY",
+    "quantity" : 8,
+    "priceUsd" : 50.125588697017,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-04-01",
+    "settlementDate" : "2026-04-01",
+    "fxEffectiveDate" : "2026-04-01",
+    "taxFx" : 1274,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-INTC-5",
+    "accountId" : "A1",
+    "ticker" : "INTC",
+    "side" : "BUY",
+    "quantity" : 8,
+    "priceUsd" : 48.859984697781,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-05-04",
+    "settlementDate" : "2026-05-04",
+    "fxEffectiveDate" : "2026-05-04",
+    "taxFx" : 1307,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-NKE-1",
+    "accountId" : "A2",
+    "ticker" : "NKE",
+    "side" : "BUY",
+    "quantity" : 4,
+    "priceUsd" : 97.974006116208,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-01-05",
+    "settlementDate" : "2026-01-05",
+    "fxEffectiveDate" : "2026-01-05",
+    "taxFx" : 1308,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-NKE-2",
+    "accountId" : "A2",
+    "ticker" : "NKE",
+    "side" : "BUY",
+    "quantity" : 4,
+    "priceUsd" : 95.920658682635,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-02-02",
+    "settlementDate" : "2026-02-02",
+    "fxEffectiveDate" : "2026-02-02",
+    "taxFx" : 1336,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-NKE-3",
+    "accountId" : "A2",
+    "ticker" : "NKE",
+    "side" : "BUY",
+    "quantity" : 4,
+    "priceUsd" : 93.951612903226,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-03-02",
+    "settlementDate" : "2026-03-02",
+    "fxEffectiveDate" : "2026-03-02",
+    "taxFx" : 1364,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-NKE-4",
+    "accountId" : "A2",
+    "ticker" : "NKE",
+    "side" : "BUY",
+    "quantity" : 4,
+    "priceUsd" : 100.588697017268,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-04-01",
+    "settlementDate" : "2026-04-01",
+    "fxEffectiveDate" : "2026-04-01",
+    "taxFx" : 1274,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-NKE-5",
+    "accountId" : "A2",
+    "ticker" : "NKE",
+    "side" : "BUY",
+    "quantity" : 4,
+    "priceUsd" : 98.048967100230,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-05-04",
+    "settlementDate" : "2026-05-04",
+    "fxEffectiveDate" : "2026-05-04",
+    "taxFx" : 1307,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-TSLA-1",
+    "accountId" : "A3",
+    "ticker" : "TSLA",
+    "side" : "BUY",
+    "quantity" : 4,
+    "priceUsd" : 293.012232415902,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-01-05",
+    "settlementDate" : "2026-01-05",
+    "fxEffectiveDate" : "2026-01-05",
+    "taxFx" : 1308,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-TSLA-2",
+    "accountId" : "A3",
+    "ticker" : "TSLA",
+    "side" : "BUY",
+    "quantity" : 4,
+    "priceUsd" : 286.871257485030,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-02-02",
+    "settlementDate" : "2026-02-02",
+    "fxEffectiveDate" : "2026-02-02",
+    "taxFx" : 1336,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-TSLA-3",
+    "accountId" : "A3",
+    "ticker" : "TSLA",
+    "side" : "BUY",
+    "quantity" : 4,
+    "priceUsd" : 280.982404692082,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-03-02",
+    "settlementDate" : "2026-03-02",
+    "fxEffectiveDate" : "2026-03-02",
+    "taxFx" : 1364,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-TSLA-4",
+    "accountId" : "A3",
+    "ticker" : "TSLA",
+    "side" : "BUY",
+    "quantity" : 4,
+    "priceUsd" : 300.832025117739,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-04-01",
+    "settlementDate" : "2026-04-01",
+    "fxEffectiveDate" : "2026-04-01",
+    "taxFx" : 1274,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "BUY-TSLA-5",
+    "accountId" : "A3",
+    "ticker" : "TSLA",
+    "side" : "BUY",
+    "quantity" : 4,
+    "priceUsd" : 293.236419280796,
+    "feeUsd" : 0,
+    "tradeDate" : "2026-05-04",
+    "settlementDate" : "2026-05-04",
+    "fxEffectiveDate" : "2026-05-04",
+    "taxFx" : 1307,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "SELL-AAPL",
+    "accountId" : "A1",
+    "ticker" : "AAPL",
+    "side" : "SELL",
+    "quantity" : 20,
+    "priceUsd" : 183.600917431193,
+    "feeUsd" : 2.293577981651,
+    "tradeDate" : "2026-09-01",
+    "settlementDate" : "2026-09-02",
+    "fxEffectiveDate" : "2026-09-02",
+    "taxFx" : 1308,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "SELL-MSFT",
+    "accountId" : "A2",
+    "ticker" : "MSFT",
+    "side" : "SELL",
+    "quantity" : 15,
+    "priceUsd" : 275.433231396534,
+    "feeUsd" : 3.058103975535,
+    "tradeDate" : "2026-09-01",
+    "settlementDate" : "2026-09-02",
+    "fxEffectiveDate" : "2026-09-02",
+    "taxFx" : 1308,
+    "fxMode" : "DEMO"
+  }, {
+    "id" : "SELL-NVDA",
+    "accountId" : "A3",
+    "ticker" : "NVDA",
+    "side" : "SELL",
+    "quantity" : 25,
+    "priceUsd" : 214.220183486239,
+    "feeUsd" : 3.822629969419,
+    "tradeDate" : "2026-09-01",
+    "settlementDate" : "2026-09-02",
+    "fxEffectiveDate" : "2026-09-02",
+    "taxFx" : 1308,
+    "fxMode" : "DEMO"
+  } ],
+  "holdings" : [ {
+    "accountId" : "A1",
+    "ticker" : "AAPL",
+    "quantity" : 20,
+    "principalUsd" : 2273.322130624290000000000000,
+    "principalKrw" : 3000000.000000000750000000000000,
+    "costKrw" : 3000000.000000000750000000000000,
+    "priceUsd" : 126.65198238
+  }, {
+    "accountId" : "A2",
+    "ticker" : "MSFT",
+    "quantity" : 15,
+    "principalUsd" : 3032.775573623782500000000000,
+    "principalKrw" : 4000000.000000002760000000000000,
+    "costKrw" : 4000000.000000002760000000000000,
+    "priceUsd" : 225.15907978
+  }, {
+    "accountId" : "A3",
+    "ticker" : "NVDA",
+    "quantity" : 25,
+    "principalUsd" : 3790.129767300697500000000000,
+    "principalKrw" : 5000000.000000003300000000000000,
+    "costKrw" : 5000000.000000003300000000000000,
+    "priceUsd" : 168.86930984
+  }, {
+    "accountId" : "A1",
+    "ticker" : "INTC",
+    "quantity" : 40,
+    "principalUsd" : 1939.406291040032,
+    "principalKrw" : 2554400.000000000040,
+    "costKrw" : 2554400.000000000040,
+    "priceUsd" : 30
+  }, {
+    "accountId" : "A2",
+    "ticker" : "NKE",
+    "quantity" : 20,
+    "principalUsd" : 1945.935767278268,
+    "principalKrw" : 2563000.000000002920,
+    "costKrw" : 2563000.000000002920,
+    "priceUsd" : 75
+  }, {
+    "accountId" : "A3",
+    "ticker" : "TSLA",
+    "quantity" : 20,
+    "principalUsd" : 5819.737355966196,
+    "principalKrw" : 7665199.999999998408,
+    "costKrw" : 7665199.999999998408,
+    "priceUsd" : 230
+  } ],
+  "snapshots" : {
+    "A1" : 1800000,
+    "A2" : 1400000,
+    "A3" : 2000000
+  },
+  "fx" : {
+    "id" : "demo-2026-10-26",
+    "requestedDate" : "2026-10-26",
+    "effectiveDate" : "2026-10-26",
+    "rate" : 1362,
+    "source" : "가상 환율 시드 · 실제 공시 아님",
+    "mode" : "DEMO",
+    "fetchedAt" : "2026-10-27T06:51:44.525110Z",
+    "history" : [ {
+      "date" : "2025-12-22",
+      "rate" : 1294
+    }, {
+      "date" : "2025-12-23",
+      "rate" : 1295
+    }, {
+      "date" : "2025-12-24",
+      "rate" : 1296
+    }, {
+      "date" : "2025-12-25",
+      "rate" : 1297
+    }, {
+      "date" : "2025-12-26",
+      "rate" : 1298
+    }, {
+      "date" : "2025-12-29",
+      "rate" : 1301
+    }, {
+      "date" : "2025-12-30",
+      "rate" : 1302
+    }, {
+      "date" : "2025-12-31",
+      "rate" : 1303
+    }, {
+      "date" : "2026-01-01",
+      "rate" : 1304
+    }, {
+      "date" : "2026-01-02",
+      "rate" : 1305
+    }, {
+      "date" : "2026-01-05",
+      "rate" : 1308
+    }, {
+      "date" : "2026-01-06",
+      "rate" : 1309
+    }, {
+      "date" : "2026-01-07",
+      "rate" : 1310
+    }, {
+      "date" : "2026-01-08",
+      "rate" : 1311
+    }, {
+      "date" : "2026-01-09",
+      "rate" : 1312
+    }, {
+      "date" : "2026-01-12",
+      "rate" : 1315
+    }, {
+      "date" : "2026-01-13",
+      "rate" : 1316
+    }, {
+      "date" : "2026-01-14",
+      "rate" : 1317
+    }, {
+      "date" : "2026-01-15",
+      "rate" : 1318
+    }, {
+      "date" : "2026-01-16",
+      "rate" : 1319
+    }, {
+      "date" : "2026-01-19",
+      "rate" : 1322
+    }, {
+      "date" : "2026-01-20",
+      "rate" : 1323
+    }, {
+      "date" : "2026-01-21",
+      "rate" : 1324
+    }, {
+      "date" : "2026-01-22",
+      "rate" : 1325
+    }, {
+      "date" : "2026-01-23",
+      "rate" : 1326
+    }, {
+      "date" : "2026-01-26",
+      "rate" : 1329
+    }, {
+      "date" : "2026-01-27",
+      "rate" : 1330
+    }, {
+      "date" : "2026-01-28",
+      "rate" : 1331
+    }, {
+      "date" : "2026-01-29",
+      "rate" : 1332
+    }, {
+      "date" : "2026-01-30",
+      "rate" : 1333
+    }, {
+      "date" : "2026-02-02",
+      "rate" : 1336
+    }, {
+      "date" : "2026-02-03",
+      "rate" : 1337
+    }, {
+      "date" : "2026-02-04",
+      "rate" : 1338
+    }, {
+      "date" : "2026-02-05",
+      "rate" : 1339
+    }, {
+      "date" : "2026-02-06",
+      "rate" : 1340
+    }, {
+      "date" : "2026-02-09",
+      "rate" : 1343
+    }, {
+      "date" : "2026-02-10",
+      "rate" : 1344
+    }, {
+      "date" : "2026-02-11",
+      "rate" : 1345
+    }, {
+      "date" : "2026-02-12",
+      "rate" : 1346
+    }, {
+      "date" : "2026-02-13",
+      "rate" : 1347
+    }, {
+      "date" : "2026-02-16",
+      "rate" : 1350
+    }, {
+      "date" : "2026-02-17",
+      "rate" : 1351
+    }, {
+      "date" : "2026-02-18",
+      "rate" : 1352
+    }, {
+      "date" : "2026-02-19",
+      "rate" : 1353
+    }, {
+      "date" : "2026-02-20",
+      "rate" : 1354
+    }, {
+      "date" : "2026-02-23",
+      "rate" : 1357
+    }, {
+      "date" : "2026-02-24",
+      "rate" : 1358
+    }, {
+      "date" : "2026-02-25",
+      "rate" : 1359
+    }, {
+      "date" : "2026-02-26",
+      "rate" : 1360
+    }, {
+      "date" : "2026-02-27",
+      "rate" : 1361
+    }, {
+      "date" : "2026-03-02",
+      "rate" : 1364
+    }, {
+      "date" : "2026-03-03",
+      "rate" : 1365
+    }, {
+      "date" : "2026-03-04",
+      "rate" : 1366
+    }, {
+      "date" : "2026-03-05",
+      "rate" : 1367
+    }, {
+      "date" : "2026-03-06",
+      "rate" : 1368
+    }, {
+      "date" : "2026-03-09",
+      "rate" : 1251
+    }, {
+      "date" : "2026-03-10",
+      "rate" : 1252
+    }, {
+      "date" : "2026-03-11",
+      "rate" : 1253
+    }, {
+      "date" : "2026-03-12",
+      "rate" : 1254
+    }, {
+      "date" : "2026-03-13",
+      "rate" : 1255
+    }, {
+      "date" : "2026-03-16",
+      "rate" : 1258
+    }, {
+      "date" : "2026-03-17",
+      "rate" : 1259
+    }, {
+      "date" : "2026-03-18",
+      "rate" : 1260
+    }, {
+      "date" : "2026-03-19",
+      "rate" : 1261
+    }, {
+      "date" : "2026-03-20",
+      "rate" : 1262
+    }, {
+      "date" : "2026-03-23",
+      "rate" : 1265
+    }, {
+      "date" : "2026-03-24",
+      "rate" : 1266
+    }, {
+      "date" : "2026-03-25",
+      "rate" : 1267
+    }, {
+      "date" : "2026-03-26",
+      "rate" : 1268
+    }, {
+      "date" : "2026-03-27",
+      "rate" : 1269
+    }, {
+      "date" : "2026-03-30",
+      "rate" : 1272
+    }, {
+      "date" : "2026-03-31",
+      "rate" : 1273
+    }, {
+      "date" : "2026-04-01",
+      "rate" : 1274
+    }, {
+      "date" : "2026-04-02",
+      "rate" : 1275
+    }, {
+      "date" : "2026-04-03",
+      "rate" : 1276
+    }, {
+      "date" : "2026-04-06",
+      "rate" : 1279
+    }, {
+      "date" : "2026-04-07",
+      "rate" : 1280
+    }, {
+      "date" : "2026-04-08",
+      "rate" : 1281
+    }, {
+      "date" : "2026-04-09",
+      "rate" : 1282
+    }, {
+      "date" : "2026-04-10",
+      "rate" : 1283
+    }, {
+      "date" : "2026-04-13",
+      "rate" : 1286
+    }, {
+      "date" : "2026-04-14",
+      "rate" : 1287
+    }, {
+      "date" : "2026-04-15",
+      "rate" : 1288
+    }, {
+      "date" : "2026-04-16",
+      "rate" : 1289
+    }, {
+      "date" : "2026-04-17",
+      "rate" : 1290
+    }, {
+      "date" : "2026-04-20",
+      "rate" : 1293
+    }, {
+      "date" : "2026-04-21",
+      "rate" : 1294
+    }, {
+      "date" : "2026-04-22",
+      "rate" : 1295
+    }, {
+      "date" : "2026-04-23",
+      "rate" : 1296
+    }, {
+      "date" : "2026-04-24",
+      "rate" : 1297
+    }, {
+      "date" : "2026-04-27",
+      "rate" : 1300
+    }, {
+      "date" : "2026-04-28",
+      "rate" : 1301
+    }, {
+      "date" : "2026-04-29",
+      "rate" : 1302
+    }, {
+      "date" : "2026-04-30",
+      "rate" : 1303
+    }, {
+      "date" : "2026-05-01",
+      "rate" : 1304
+    }, {
+      "date" : "2026-05-04",
+      "rate" : 1307
+    }, {
+      "date" : "2026-05-05",
+      "rate" : 1308
+    }, {
+      "date" : "2026-05-06",
+      "rate" : 1309
+    }, {
+      "date" : "2026-05-07",
+      "rate" : 1310
+    }, {
+      "date" : "2026-05-08",
+      "rate" : 1311
+    }, {
+      "date" : "2026-05-11",
+      "rate" : 1314
+    }, {
+      "date" : "2026-05-12",
+      "rate" : 1315
+    }, {
+      "date" : "2026-05-13",
+      "rate" : 1316
+    }, {
+      "date" : "2026-05-14",
+      "rate" : 1317
+    }, {
+      "date" : "2026-05-15",
+      "rate" : 1318
+    }, {
+      "date" : "2026-05-18",
+      "rate" : 1321
+    }, {
+      "date" : "2026-05-19",
+      "rate" : 1322
+    }, {
+      "date" : "2026-05-20",
+      "rate" : 1323
+    }, {
+      "date" : "2026-05-21",
+      "rate" : 1324
+    }, {
+      "date" : "2026-05-22",
+      "rate" : 1325
+    }, {
+      "date" : "2026-05-25",
+      "rate" : 1328
+    }, {
+      "date" : "2026-05-26",
+      "rate" : 1329
+    }, {
+      "date" : "2026-05-27",
+      "rate" : 1330
+    }, {
+      "date" : "2026-05-28",
+      "rate" : 1331
+    }, {
+      "date" : "2026-05-29",
+      "rate" : 1332
+    }, {
+      "date" : "2026-06-01",
+      "rate" : 1335
+    }, {
+      "date" : "2026-06-02",
+      "rate" : 1336
+    }, {
+      "date" : "2026-06-03",
+      "rate" : 1337
+    }, {
+      "date" : "2026-06-04",
+      "rate" : 1338
+    }, {
+      "date" : "2026-06-05",
+      "rate" : 1339
+    }, {
+      "date" : "2026-06-08",
+      "rate" : 1342
+    }, {
+      "date" : "2026-06-09",
+      "rate" : 1343
+    }, {
+      "date" : "2026-06-10",
+      "rate" : 1344
+    }, {
+      "date" : "2026-06-11",
+      "rate" : 1345
+    }, {
+      "date" : "2026-06-12",
+      "rate" : 1346
+    }, {
+      "date" : "2026-06-15",
+      "rate" : 1349
+    }, {
+      "date" : "2026-06-16",
+      "rate" : 1350
+    }, {
+      "date" : "2026-06-17",
+      "rate" : 1351
+    }, {
+      "date" : "2026-06-18",
+      "rate" : 1352
+    }, {
+      "date" : "2026-06-19",
+      "rate" : 1353
+    }, {
+      "date" : "2026-06-22",
+      "rate" : 1356
+    }, {
+      "date" : "2026-06-23",
+      "rate" : 1357
+    }, {
+      "date" : "2026-06-24",
+      "rate" : 1358
+    }, {
+      "date" : "2026-06-25",
+      "rate" : 1359
+    }, {
+      "date" : "2026-06-26",
+      "rate" : 1360
+    }, {
+      "date" : "2026-06-29",
+      "rate" : 1363
+    }, {
+      "date" : "2026-06-30",
+      "rate" : 1364
+    }, {
+      "date" : "2026-07-01",
+      "rate" : 1365
+    }, {
+      "date" : "2026-07-02",
+      "rate" : 1366
+    }, {
+      "date" : "2026-07-03",
+      "rate" : 1367
+    }, {
+      "date" : "2026-07-06",
+      "rate" : 1250
+    }, {
+      "date" : "2026-07-07",
+      "rate" : 1251
+    }, {
+      "date" : "2026-07-08",
+      "rate" : 1252
+    }, {
+      "date" : "2026-07-09",
+      "rate" : 1253
+    }, {
+      "date" : "2026-07-10",
+      "rate" : 1254
+    }, {
+      "date" : "2026-07-13",
+      "rate" : 1257
+    }, {
+      "date" : "2026-07-14",
+      "rate" : 1258
+    }, {
+      "date" : "2026-07-15",
+      "rate" : 1259
+    }, {
+      "date" : "2026-07-16",
+      "rate" : 1260
+    }, {
+      "date" : "2026-07-17",
+      "rate" : 1261
+    }, {
+      "date" : "2026-07-20",
+      "rate" : 1264
+    }, {
+      "date" : "2026-07-21",
+      "rate" : 1265
+    }, {
+      "date" : "2026-07-22",
+      "rate" : 1266
+    }, {
+      "date" : "2026-07-23",
+      "rate" : 1267
+    }, {
+      "date" : "2026-07-24",
+      "rate" : 1268
+    }, {
+      "date" : "2026-07-27",
+      "rate" : 1271
+    }, {
+      "date" : "2026-07-28",
+      "rate" : 1272
+    }, {
+      "date" : "2026-07-29",
+      "rate" : 1273
+    }, {
+      "date" : "2026-07-30",
+      "rate" : 1274
+    }, {
+      "date" : "2026-07-31",
+      "rate" : 1275
+    }, {
+      "date" : "2026-08-03",
+      "rate" : 1278
+    }, {
+      "date" : "2026-08-04",
+      "rate" : 1279
+    }, {
+      "date" : "2026-08-05",
+      "rate" : 1280
+    }, {
+      "date" : "2026-08-06",
+      "rate" : 1281
+    }, {
+      "date" : "2026-08-07",
+      "rate" : 1282
+    }, {
+      "date" : "2026-08-10",
+      "rate" : 1285
+    }, {
+      "date" : "2026-08-11",
+      "rate" : 1286
+    }, {
+      "date" : "2026-08-12",
+      "rate" : 1287
+    }, {
+      "date" : "2026-08-13",
+      "rate" : 1288
+    }, {
+      "date" : "2026-08-14",
+      "rate" : 1289
+    }, {
+      "date" : "2026-08-17",
+      "rate" : 1292
+    }, {
+      "date" : "2026-08-18",
+      "rate" : 1293
+    }, {
+      "date" : "2026-08-19",
+      "rate" : 1294
+    }, {
+      "date" : "2026-08-20",
+      "rate" : 1295
+    }, {
+      "date" : "2026-08-21",
+      "rate" : 1296
+    }, {
+      "date" : "2026-08-24",
+      "rate" : 1299
+    }, {
+      "date" : "2026-08-25",
+      "rate" : 1300
+    }, {
+      "date" : "2026-08-26",
+      "rate" : 1301
+    }, {
+      "date" : "2026-08-27",
+      "rate" : 1302
+    }, {
+      "date" : "2026-08-28",
+      "rate" : 1303
+    }, {
+      "date" : "2026-08-31",
+      "rate" : 1306
+    }, {
+      "date" : "2026-09-01",
+      "rate" : 1307
+    }, {
+      "date" : "2026-09-02",
+      "rate" : 1308
+    }, {
+      "date" : "2026-09-03",
+      "rate" : 1309
+    }, {
+      "date" : "2026-09-04",
+      "rate" : 1310
+    }, {
+      "date" : "2026-09-07",
+      "rate" : 1313
+    }, {
+      "date" : "2026-09-08",
+      "rate" : 1314
+    }, {
+      "date" : "2026-09-09",
+      "rate" : 1315
+    }, {
+      "date" : "2026-09-10",
+      "rate" : 1316
+    }, {
+      "date" : "2026-09-11",
+      "rate" : 1317
+    }, {
+      "date" : "2026-09-14",
+      "rate" : 1320
+    }, {
+      "date" : "2026-09-15",
+      "rate" : 1321
+    }, {
+      "date" : "2026-09-16",
+      "rate" : 1322
+    }, {
+      "date" : "2026-09-17",
+      "rate" : 1323
+    }, {
+      "date" : "2026-09-18",
+      "rate" : 1324
+    }, {
+      "date" : "2026-09-21",
+      "rate" : 1327
+    }, {
+      "date" : "2026-09-22",
+      "rate" : 1328
+    }, {
+      "date" : "2026-09-23",
+      "rate" : 1329
+    }, {
+      "date" : "2026-09-24",
+      "rate" : 1330
+    }, {
+      "date" : "2026-09-25",
+      "rate" : 1331
+    }, {
+      "date" : "2026-09-28",
+      "rate" : 1334
+    }, {
+      "date" : "2026-09-29",
+      "rate" : 1335
+    }, {
+      "date" : "2026-09-30",
+      "rate" : 1336
+    }, {
+      "date" : "2026-10-01",
+      "rate" : 1337
+    }, {
+      "date" : "2026-10-02",
+      "rate" : 1338
+    }, {
+      "date" : "2026-10-05",
+      "rate" : 1341
+    }, {
+      "date" : "2026-10-06",
+      "rate" : 1342
+    }, {
+      "date" : "2026-10-07",
+      "rate" : 1343
+    }, {
+      "date" : "2026-10-08",
+      "rate" : 1344
+    }, {
+      "date" : "2026-10-09",
+      "rate" : 1345
+    }, {
+      "date" : "2026-10-12",
+      "rate" : 1348
+    }, {
+      "date" : "2026-10-13",
+      "rate" : 1349
+    }, {
+      "date" : "2026-10-14",
+      "rate" : 1350
+    }, {
+      "date" : "2026-10-15",
+      "rate" : 1351
+    }, {
+      "date" : "2026-10-16",
+      "rate" : 1352
+    }, {
+      "date" : "2026-10-19",
+      "rate" : 1355
+    }, {
+      "date" : "2026-10-20",
+      "rate" : 1356
+    }, {
+      "date" : "2026-10-21",
+      "rate" : 1357
+    }, {
+      "date" : "2026-10-22",
+      "rate" : 1358
+    }, {
+      "date" : "2026-10-23",
+      "rate" : 1359
+    }, {
+      "date" : "2026-10-26",
+      "rate" : 1362
+    } ],
+    "warning" : "사용자가 선택한 가상 환율 모드입니다."
+  },
+  "createdAt" : "2026-10-27T06:51:44.538111800Z"
+}

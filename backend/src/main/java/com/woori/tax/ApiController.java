@@ -11,14 +11,13 @@ public class ApiController {
     private final DemoData data;
     private final ScenarioService scenarios;
     private final AssistantService assistant;
-    private final OpenAiService ai;
     private final ConversationService conversations;
     private final PortfolioSimulationService simulation;
     private final EvidenceService evidence;
     private final LiveAssessmentService liveAssessment;
     private final LiveResearchService liveResearch;
-    public ApiController(DemoData data, ScenarioService scenarios, AssistantService assistant, OpenAiService ai, ConversationService conversations, PortfolioSimulationService simulation, EvidenceService evidence, LiveAssessmentService liveAssessment, LiveResearchService liveResearch) {
-        this.data = data; this.scenarios = scenarios; this.assistant = assistant; this.ai = ai; this.conversations = conversations;
+    public ApiController(DemoData data, ScenarioService scenarios, AssistantService assistant, ConversationService conversations, PortfolioSimulationService simulation, EvidenceService evidence, LiveAssessmentService liveAssessment, LiveResearchService liveResearch) {
+        this.data = data; this.scenarios = scenarios; this.assistant = assistant; this.conversations = conversations;
         this.simulation = simulation; this.evidence = evidence; this.liveAssessment = liveAssessment; this.liveResearch = liveResearch;
     }
     @GetMapping("/portfolio") public Map<String,Object> portfolio() {
@@ -44,9 +43,10 @@ public class ApiController {
     @GetMapping("/research") public Map<String,Object> research() {
         return Map.of("notes", evidence.notes(), "sources", evidence.all(java.time.LocalDate.parse(data.rule.asOf())), "asOf", data.rule.asOf());
     }
-    @PostMapping("/research/live") public Map<String,Object> liveResearch() {
-        var found = liveResearch.research();
-        return Map.of("research", found, "researchedAt", java.time.LocalDate.now(java.time.ZoneId.of("Asia/Seoul")).toString());
+    @PostMapping("/research/live") public LiveResearchService.Brief liveResearch(
+        @RequestParam(defaultValue = "false") boolean retryAnalysis,
+        @RequestParam(defaultValue = "false") boolean refreshSearch) {
+        return liveResearch.brief(retryAnalysis, refreshSearch);
     }
     @PostMapping("/conditions/extract") public Map<String,Object> extract(@RequestBody ExtractRequest request) { return assistant.extract(request); }
     @DeleteMapping("/conversations/{id}") public Map<String,String> resetConversation(@PathVariable String id) {
@@ -58,6 +58,8 @@ public class ApiController {
         if (!data.symbols().contains(symbol)) throw new IllegalArgumentException("보유 종목을 선택해 주세요.");
         return assistant.sources(symbol);
     }
-    @GetMapping("/ai/usage") public Map<String,Object> usage() { return ai.status(); }
     @ExceptionHandler(IllegalArgumentException.class) public ResponseEntity<Map<String,String>> badRequest(IllegalArgumentException e) { return ResponseEntity.badRequest().body(Map.of("message", e.getMessage())); }
+    @ExceptionHandler(OpenAiService.AiUnavailable.class) public ResponseEntity<Map<String,String>> aiUnavailable(OpenAiService.AiUnavailable e) {
+        return ResponseEntity.status(503).body(Map.of("message", e.getMessage()));
+    }
 }

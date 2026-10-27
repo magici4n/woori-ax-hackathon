@@ -5,7 +5,7 @@ export function ServiceHeader({ onNavigate }) {
 }
 
 export function JourneyNav({ active, onNavigate, canCompare }) {
-  const steps = [['analysis', '내 계좌 분석'], ['events', '기업 자료 확인'], ['conditions', '질문하기'], ['scenarios', '절세안'], ['report', '리포트']];
+  const steps = [['analysis', '내 계좌 분석'], ['events', '이벤트 분석'], ['conditions', '질문하기'], ['scenarios', '절세안'], ['report', '리포트']];
   const current = active === 'assets' ? -1 : steps.findIndex(([id]) => id === active);
   return <nav className="reference-journey" aria-label="절세 시나리오 진행 단계">{steps.map(([id, label], index) => <button key={id} className={index === current ? 'current' : index < current ? 'done' : ''} disabled={(!canCompare && index > 0) || (index > current && id !== 'events')} onClick={() => onNavigate(id)} aria-current={index === current ? 'step' : undefined}><span>{index + 1}</span><strong>{label}</strong></button>)}</nav>;
 }

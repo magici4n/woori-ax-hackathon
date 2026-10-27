@@ -53,9 +53,11 @@ public class LiveAssessmentService {
                 + "세액·수수료·절세액은 계산하거나 단정하지 마세요. Java가 검증 및 계산합니다. 근거가 약하면 확신을 낮추세요. "
                 + "JSON만 반환: {\"proposals\":[{\"id\":\"balanced\",\"title\":\"전략명\",\"reason\":\"선택 근거\",\"tradeoff\":\"보유 기회와 위험\",\"sourceIds\":[\"live-0\"],\"sales\":[{\"symbol\":\"TSLA\",\"quantity\":0}],\"stockReasons\":[{\"symbol\":\"TSLA\",\"reason\":\"해당 종목을 이 수량만큼 매도 또는 보유하는 이유\"}]},{\"id\":\"alternative\",\"title\":\"다른 전략명\",\"reason\":\"선택 근거\",\"tradeoff\":\"보유 기회와 위험\",\"sourceIds\":[\"live-0\"],\"sales\":[{\"symbol\":\"TSLA\",\"quantity\":0}],\"stockReasons\":[{\"symbol\":\"TSLA\",\"reason\":\"선택 이유\"}]}]}. "
                 + "sourceIds는 제공된 출처 ID만 사용하세요.";
+            var currentBrief = liveResearch.currentBrief();
             String proposalInput = mapper.writeValueAsString(Map.of("asOf", today.toString(), "conditions", original.conditions(), "decisionPriority", priority,
                 "baselineTaxKrw", original.baselineTaxKrw(), "maxTaxReductionKrw", original.maxTaxReductionKrw(),
-                "holdings", simulation.planningFacts(original.conditions()), "groundedClaims", research.claims(), "sources", research.sources()));
+                "holdings", simulation.planningFacts(original.conditions()), "groundedClaims", research.claims(), "sources", research.sources(),
+                "articleSummaries", currentBrief == null ? List.of() : currentBrief.articles()));
             JsonNode proposed = ai.json(system, proposalInput, "live-proposals-" + today);
             JsonNode proposals = proposed.path("proposals");
             if (!proposals.isArray() || proposals.size() != 2 || !"balanced".equals(proposals.get(0).path("id").asText())
@@ -77,7 +79,7 @@ public class LiveAssessmentService {
             notices.removeIf(note -> note.startsWith("기업 자료는 보유·매도의 기회와 위험을 이해하는 참고 정보입니다.")
                 || note.startsWith("원화 세무상 손실을 실현하는 조합을 비교합니다."));
             notices.add("AI가 최신 검색 근거와 사용자 조건으로 가상 매도 수량을 제안했습니다. Java가 제한을 검증하고 세액·수수료·자산을 계산했습니다.");
-            notices.add("AI 제안에는 이익 실현 매도가 포함될 수 있으며, 같은 종목은 시연 계좌 A→B 순서로 매도합니다.");
+            notices.add("AI 제안에는 이익 실현 매도가 포함될 수 있으며, 같은 종목은 데이터에 저장된 계좌 순서로 매도합니다.");
             notices.add("검색 자료는 사실 확인의 출발점이며, 시연 계좌·가격·환율은 가상 데이터입니다.");
             PortfolioComparison comparison = new PortfolioComparison(original.baselineTaxKrw(), original.maxTaxReductionKrw(),
                 original.conditions(), original.rule(), List.of(original.scenarios().get(0), balanced, alternative), notices);
@@ -89,7 +91,7 @@ public class LiveAssessmentService {
             return new Assessment("unavailable", original, null, null, e.getMessage(), today.toString());
         } catch (Exception ignored) {
             return new Assessment("unavailable", original, null, null,
-                "최신 자료 조사 또는 AI 판단을 검증할 수 없어 기존 계산 기준을 사용했습니다. AI 사용 상태를 확인하세요.", today.toString());
+                "최신 자료 조사 또는 AI 판단을 검증할 수 없어 기존 계산 기준을 사용했습니다. 키·네트워크·출처를 확인하세요.", today.toString());
         }
     }
 

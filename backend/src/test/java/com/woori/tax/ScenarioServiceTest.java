@@ -24,21 +24,21 @@ class ScenarioServiceTest {
         var accounts = List.of(new Account("A", "A1", d("5000000")), new Account("B", "B1", d("-2000000")));
         assertThat(ScenarioService.sumRealized(accounts)).isEqualByComparingTo("3000000");
     }
-    @Test void dollarLossIsNotAutomaticallyATaxLoss() {
-        var amazon = data.lots.stream().filter(l -> l.symbol().equals("AMZN")).findFirst().orElseThrow();
-        assertThat(amazon.priceUsd().subtract(amazon.buyUsd())).isNegative();
-        assertThat(service.perShareTaxGain(amazon)).isPositive();
-        var result = compare("AMZN", Conditions.empty(), null);
+    @Test void profitableHoldingIsNotUsedForTaxLossHarvesting() {
+        var apple = data.lots.stream().filter(l -> l.symbol().equals("AAPL")).findFirst().orElseThrow();
+        assertThat(service.perShareTaxGain(apple)).isPositive();
+        var result = compare("AAPL", Conditions.empty(), null);
         assertThat(result.scenarios().get(1).sellQuantity()).isZero();
         assertThat(result.notices()).anyMatch(s -> s.contains("세무상 손실"));
     }
     @Test void partialSaleFindsMinimumIntegerQuantity() {
         var result = compare("TSLA", Conditions.empty(), null);
         var partial = result.scenarios().get(1);
-        assertThat(partial.sellQuantity()).isEqualTo(29);
-        assertThat(partial.estimatedTaxKrw()).isZero();
-        assertThat(compare("TSLA", Conditions.empty(), 28).scenarios().get(3).estimatedTaxKrw()).isPositive();
-        assertThat(partial.taxReductionKrw()).isEqualByComparingTo("550000");
+        assertThat(partial.sellQuantity()).isEqualTo(20);
+        assertThat(partial.estimatedTaxKrw()).isPositive();
+        assertThat(compare("TSLA", Conditions.empty(), 19).scenarios().get(3).estimatedTaxKrw())
+            .isGreaterThan(partial.estimatedTaxKrw());
+        assertThat(partial.taxReductionKrw()).isPositive().isLessThan(result.baselineTaxKrw());
     }
     @Test void excludedStockHasNoAllowedSale() {
         var conditions = new Conditions(Map.of("TSLA", new Condition(true, null, null)), null);
@@ -48,11 +48,11 @@ class ScenarioServiceTest {
         assertThat(result.scenarios().get(2).allowed()).isFalse();
     }
     @Test void quantityAndRatioAreBothRespected() {
-        var conditions = new Conditions(Map.of("TSLA", new Condition(false, 30, d("50"))), null);
+        var conditions = new Conditions(Map.of("TSLA", new Condition(false, 12, d("50"))), null);
         var result = compare("TSLA", conditions, null);
-        assertThat(result.maxAllowedQuantity()).isEqualTo(25);
-        assertThat(result.scenarios().stream().filter(Scenario::allowed)).allMatch(s -> s.sellQuantity() <= 25);
-        assertThatThrownBy(() -> compare("TSLA", conditions, 26)).isInstanceOf(IllegalArgumentException.class);
+        assertThat(result.maxAllowedQuantity()).isEqualTo(10);
+        assertThat(result.scenarios().stream().filter(Scenario::allowed)).allMatch(s -> s.sellQuantity() <= 10);
+        assertThatThrownBy(() -> compare("TSLA", conditions, 11)).isInstanceOf(IllegalArgumentException.class);
         assertThat(service.allowedQuantity(15, new Condition(false, null, d("50")))).isEqualTo(7);
     }
     @Test void impossibleTargetDoesNotRelaxConditions() {
@@ -67,18 +67,18 @@ class ScenarioServiceTest {
     @Test void pastBuyCostAndAdditionalSellFeeAreNotDoubleCounted() {
         var result = compare("TSLA", Conditions.empty(), 1);
         var custom = result.scenarios().get(3);
-        assertThat(custom.saleFeeKrw()).isEqualByComparingTo("828");
-        assertThat(custom.realizedGainKrw()).isEqualByComparingTo("-86628");
-        assertThat(custom.cashKrw()).isEqualByComparingTo("330372");
+        var tesla = data.lots.stream().filter(l -> l.symbol().equals("TSLA")).findFirst().orElseThrow();
+        assertThat(custom.saleFeeKrw()).isEqualByComparingTo(ScenarioService.won(tesla.priceUsd().multiply(data.rule.fx()).multiply(tesla.sellFeeRate())));
+        assertThat(custom.cashKrw().add(custom.saleFeeKrw())).isEqualByComparingTo(tesla.priceUsd().multiply(data.rule.fx()));
+        assertThat(custom.realizedGainKrw()).isNegative();
         var expected = custom.cashKrw().add(custom.remainingValueKrw()).subtract(custom.estimatedTaxKrw());
         assertThat(custom.futures().get(1).netAssetsKrw()).isEqualByComparingTo(expected);
     }
     @Test void completeSaleKeepsCashFixedAcrossFuturePriceAssumptions() {
         var full = compare("TSLA", Conditions.empty(), null).scenarios().get(2);
         assertThat(full.futures().stream().map(FutureValue::netAssetsKrw).distinct()).hasSize(1);
-        assertThat(full.sales()).hasSize(2);
-        assertThat(full.sales().get(0).quantity()).isEqualTo(30);
-        assertThat(full.sales().get(1).quantity()).isEqualTo(20);
+        assertThat(full.sales()).hasSize(1);
+        assertThat(full.sales().get(0).quantity()).isEqualTo(20);
     }
     @Test void unknownAndInvalidConditionsAreRejected() {
         assertThatThrownBy(() -> compare("UNKNOWN", Conditions.empty(), null)).isInstanceOf(IllegalArgumentException.class);

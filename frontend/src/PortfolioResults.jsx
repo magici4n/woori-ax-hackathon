@@ -9,9 +9,10 @@ export function AssetOverview({ portfolio, onDiscuss, busy }) {
       <div className="summary-card"><span>올해 합산 실현손익</span><strong>{signedWon(portfolio.realizedKrw)}</strong><small>{portfolio.accounts.length}개 시연 계좌 손익 합산</small></div>
       <div className="summary-card blue"><span>현재 예상 양도소득세</span><strong>{won(portfolio.estimatedTaxKrw)}</strong><small>기본공제 {won(portfolio.rule.deductionKrw)} 반영</small></div>
     </div>
-    <section className="panel holdings-overview"><div className="section-heading"><div><span className="eyebrow">INVESTMENTS</span><h2>내가 보유한 종목</h2></div><span className="tag">4개 종목 · 모든 계좌 합산</span></div>
-      <div className="table-scroll"><table className="assets-table"><thead><tr><th>종목</th><th>보유 수량</th><th>취득가액</th><th>평가액</th><th>원화 평가손익</th></tr></thead><tbody>{Object.entries(names).map(([symbol, name]) => {
+    <section className="panel holdings-overview"><div className="section-heading"><div><span className="eyebrow">INVESTMENTS</span><h2>내가 보유한 종목</h2></div><span className="tag">{new Set(portfolio.positions.map(p => p.lot.symbol)).size}개 종목 · 모든 계좌 합산</span></div>
+      <div className="table-scroll"><table className="assets-table"><thead><tr><th>종목</th><th>보유 수량</th><th>취득가액</th><th>평가액</th><th>원화 평가손익</th></tr></thead><tbody>{[...new Set(portfolio.positions.map(p => p.lot.symbol))].map(symbol => {
         const rows = portfolio.positions.filter(p => p.lot.symbol === symbol);
+        const name = rows[0].lot.name || names[symbol] || symbol;
         const sum = fn => rows.reduce((total, p) => total + Number(fn(p)), 0);
         const pnl = sum(p => p.unrealizedKrw);
         return <tr key={symbol}><td><div className="stock-cell"><StockMark symbol={symbol}/><div><strong>{name}</strong><small>{symbol}</small></div></div></td><td><strong>{sum(p => p.lot.quantity)}주</strong></td><td>{won(sum(p => p.lot.acquisitionKrw))}</td><td><strong>{won(sum(p => p.marketValueKrw))}</strong></td><td className={pnl < 0 ? 'negative' : 'positive'}>{signedWon(pnl)}</td></tr>;

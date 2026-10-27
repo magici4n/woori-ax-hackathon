@@ -118,9 +118,6 @@
 .results-stage .future-row { flex-direction: row; font-size: 12px; }
 .results-stage .future-row strong { font-size: 15px; }
 .flow-demo-note { margin-top: 32px; margin-bottom: 15px; }
-.flow-usage { font-size: 10px; color: #9db0c4; margin: 17px 4px 0; }
-.flow-usage summary { cursor: pointer; }
-.flow-usage p { margin-top: 9px; line-height: 1.9; }
 .flow-app .service-footer { margin-top: 30px; }
 
 @media (max-width: 1000px) {

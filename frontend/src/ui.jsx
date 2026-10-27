@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 export const won = value => new Intl.NumberFormat('ko-KR', { maximumFractionDigits: 0 }).format(value ?? 0) + '원';
 export const number = value => new Intl.NumberFormat('ko-KR', { maximumFractionDigits: 2 }).format(value ?? 0);
 export const signedWon = value => (Number(value) > 0 ? '+' : '') + won(value);
-export const names = { TSLA: '테슬라', AAPL: '애플', NVDA: '엔비디아', AMZN: '아마존' };
+export const names = { AAPL: '애플', MSFT: '마이크로소프트', NVDA: '엔비디아', INTC: '인텔', NKE: '나이키', TSLA: '테슬라' };
 export const emptyConditions = { symbols: {}, targetReductionKrw: null, cashNeedKrw: null, holdingMonths: null };
 export async function api(path, body, signal, method) {
   const response = await fetch('/api' + path, { method: method || (body === undefined ? 'GET' : 'POST'), headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body), signal });
@@ -27,7 +27,7 @@ export function Icon({ name, size = 20, ...props }) {
   };
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>{paths[name] || paths.info}</svg>;
 }
-export function StockMark({ symbol }) { return <span className={'stock-mark ' + symbol}>{symbol === 'TSLA' ? 'T' : symbol === 'AAPL' ? 'a' : symbol === 'NVDA' ? 'N' : 'a↗'}</span>; }
+export function StockMark({ symbol }) { return <span className={'stock-mark ' + symbol}>{{ AAPL: 'a', MSFT: 'M', NVDA: 'N', INTC: 'i', NKE: '✓', TSLA: 'T' }[symbol] || symbol?.[0]}</span>; }
 export function ConditionText({ symbol, condition }) {
   return <>{names[symbol]} · {condition.excluded ? '매도 제외' : [condition.maxShares != null ? `최대 ${condition.maxShares}주` : '', condition.maxPercent != null ? `최대 ${condition.maxPercent}%` : ''].filter(Boolean).join(' / ') || '제한 없음'}</>;
 }

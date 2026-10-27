@@ -139,7 +139,7 @@ class AssistantServiceTest {
         verify(ai, times(2)).json(anyString(), captor.capture(), anyString());
         var input = mapper.readTree(captor.getAllValues().get(1));
         assertThat(input.path("currentSelection").path("symbol").asText()).isEqualTo("TSLA");
-        assertThat(input.path("currentSelection").path("quantity").asInt()).isEqualTo(50);
+        assertThat(input.path("currentSelection").path("quantity").asInt()).isEqualTo(20);
         assertThat(input.path("recentMessages").size()).isEqualTo(2);
         assertThat(input.path("recentMessages").get(0).path("text").asText()).contains("이 종목");
     }
