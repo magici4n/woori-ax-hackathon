@@ -25,6 +25,8 @@ export function Icon({ name, size = 20, ...props }) {
     send: <><path d="m3 3 19 9-19 9 4-9-4-9Zm4 9h15"/></>,
     close: <path d="m6 6 12 12M18 6 6 18"/>,
     wallet: <><rect x="3" y="5" width="18" height="15" rx="3"/><path d="M3 8V5l14-3v3M16 11h5v5h-5z"/></>,
+    pie: <><path d="M12 3v9h9A9 9 0 0 0 12 3Z"/><path d="M8.5 4A9 9 0 1 0 20 15.5H8.5V4Z"/></>,
+    coins: <><ellipse cx="12" cy="5" rx="7" ry="3"/><path d="M5 5v4c0 4 14 4 14 0V5M5 9v4c0 4 14 4 14 0V9M5 13v4c0 4 14 4 14 0v-4"/></>,
   };
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>{paths[name] || paths.info}</svg>;
 }

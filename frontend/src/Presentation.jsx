@@ -30,11 +30,11 @@ export function TaxComparisonChart({ baseline, estimated }) {
   const ceiling = Math.max(Number(baseline), Number(estimated), 1);
   return <div className="presentation-tax-chart" role="img" aria-label={`현재 예상 세금 ${won(baseline)}, 시나리오 적용 후 ${won(estimated)}`}>
     {[['현재 예상 세금', baseline], ['시나리오 적용 후', estimated]].map(([label, value], index) => <div className="tax-chart-column" key={label}>
-      <strong>{won(value)}</strong><div className="tax-chart-track"><span className={index ? 'after' : 'before'} style={{ height: `${Math.max(0, Number(value)) / ceiling * 100}%` }}/></div><span>{label}</span>
+      <div className="tax-chart-track"><span className={index ? 'after' : 'before'} style={{ height: `${Math.max(0, Number(value)) / ceiling * 100}%` }}><strong>{won(value)}</strong></span></div><span>{label}{index === 0 && <small>(절세 전)</small>}</span>
     </div>)}
   </div>;
 }
 
 export function ReportProgress() {
-  return <ol className="report-progress" aria-label="최종 리포트 단계">{['내 계좌 분석', '기업 자료', '질문하기', '절세안', '리포트'].map((label, index) => <li key={label} aria-current={index === 4 ? 'step' : undefined}><span>{index + 1}</span><small>{label}</small></li>)}</ol>;
+  return <ol className="report-progress" aria-label="최종 리포트 단계">{['내 계좌 분석', '기업 자료', '맞춤 조건 설정', '절세 시나리오', '최종 리포트'].map((label, index) => <li key={label} aria-current={index === 4 ? 'step' : undefined}><span>{index + 1}</span><small>{label}</small></li>)}</ol>;
 }

@@ -143,7 +143,7 @@ export default function App() {
         onChat={async () => { if (!liveResearch) await fetchResearch(); navigate('conditions'); }}/>
       }
       {['conditions', 'scenarios', 'report'].includes(stage) && <QuestionLanding portfolio={portfolio} conditions={draft}/>}
-      <footer className="service-footer"><span>우리투자증권 · 해커톤 프로토타입</span><button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>↑ TOP</button></footer>
+      <footer className="service-footer"><button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>↑ TOP</button></footer>
     </main>
     {modal && <div className="reference-modal-backdrop" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) navigate('events'); }}><section className={'reference-modal reference-modal-' + stage} role="dialog" aria-modal="true" aria-label={stage === 'conditions' ? 'AI 맞춤 절세 상담' : stage === 'scenarios' ? '절세 시나리오 비교' : '최종 보고서'}>
       <header className="reference-modal-head"><span className="reference-ai-orb">AI</span><div><strong>WON AI 맞춤 절세 상담 <small>Beta</small></strong><p>{stage === 'conditions' ? '내 보유 종목과 조건을 바탕으로 절세 시나리오를 함께 만들어요.' : stage === 'scenarios' ? '조건을 반영한 시나리오의 세금 효과를 비교하세요.' : '선택한 시나리오의 계산 결과와 근거를 확인하세요.'}</p></div><button className="reference-close" aria-label="창 닫기" onClick={() => navigate('events')}><Icon name="close" size={24}/></button></header>
